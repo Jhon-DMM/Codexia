@@ -1,29 +1,56 @@
-h1 {
-  color: #7813d6;
-  font-size: 50px 
+header {
+  display: flex;
+  background-color: rgb(12, 0, 13);
+  margin: 0;
+  padding: 0;
+  position: relative;
   
+}
+header nav {
+  position: absolute;
+  right: 0;
+}
+header h1 {
+    color: #590e63;
+    font-size: 50px;
+    margin: 20px 0;
+  }
+
+.hero {
+  min-height: 100vh;
+  background-color: #0c000d;
+  margin: 0 ;
+}
+.hero h2 {
+  color: #720976;
+  font-size: 30px;
+  margin: 0;
+
+}
+
+p {
+  font-family: 'Poppins', sans-serif;
+  color: #b2aaaa;
+  margin: 20px 0;;
 }
 
 body {
   background-color: rgb(30, 5, 50);
+  margin: 0;
+  padding: 0;
 }
+
 
 footer {
   color: rgb(250, 251, 252);
 }
 
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 5px;
-}
 
 nav {
   flex: 1;
   ul{
     display: flex;
-    justify-content: flex-end; 
+    justify-content: center; 
     gap: 10px;
     align-items: center;
     list-style: none;
@@ -35,13 +62,11 @@ nav {
 a {
   color: rgb(252, 250, 254);
   text-decoration: none;
-  transition: text-shadow 0.3s ease-in-out, color 0.3s ease-in-out;
 }
 
 a:hover {
   color: #7813d6;
   text-decoration: none;
-  text-shadow: 0 1px 8px #7813d6;
 }
 
 nav a {
@@ -59,4 +84,9 @@ nav a:hover {
 }
 nav a:active {
   transform: scale(0.95);
+}
+.contenedor-tarjetas {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 300;
+  color: #fafafa;
 }
