@@ -1,6 +1,6 @@
 header {
   display: flex;
-  background-color: rgb(12, 0, 13);
+  background-color: #20043b;
   margin: 0;
   padding: 0;
   position: relative;
@@ -11,19 +11,38 @@ header nav {
   right: 0;
 }
 header h1 {
-    color: #590e63;
+    color: #7a1188;
     font-size: 50px;
     margin: 20px 0;
   }
 
 .hero {
+  width: 100%;
   min-height: 100vh;
-  background-color: #0c000d;
+  overflow: hidden;
+  background-color: #20043b;
   margin: 0 ;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.hero-text {
+  font-size: 20px;
+}
+.hero-image {
+  width: 1%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.hero-image img {
+  width: 95%;
+  max-width: 550px;
 }
 .hero h2 {
-  color: #720976;
-  font-size: 30px;
+  color: #7a1188;
+  font-size: 40px;
   margin: 0;
 
 }
@@ -31,7 +50,6 @@ header h1 {
 p {
   font-family: 'Poppins', sans-serif;
   color: #b2aaaa;
-  margin: 20px 0;;
 }
 
 body {
@@ -89,4 +107,39 @@ nav a:active {
   font-family: 'Poppins', sans-serif;
   font-weight: 300;
   color: #fafafa;
+  display: flex;
+  justify-content: flex-end;
+  gap: 20px;       
+  padding: 30px;
+  
+}
+.tarjeta {
+  flex: 1;
+  min-width: 100px;        
+  max-width: 150px;
+  background: rgba(30, 26, 46, 0.2); 
+  border: 1px solid rgba(255, 255, 255, 0.1); 
+  border-radius: 12px; 
+  padding: 24px; 
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+   transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.tarjeta:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 6px 60px rgba(0, 0, 0, 0.3);
+  border-color: #7813d6;
+}
+
+.desarrollo-web {
+  background-color: #09000a;
+}
+.tarjeta.desarrollo-software {
+  background-color: #09000a;
+}
+.inteligencia-artificial {
+  background-color: #09000a;
+}
+.ciberseguridad {
+  background-color: #09000a;
 }
