@@ -120,7 +120,7 @@ p {
   font-size: 16px;
   font-weight: 300;
   line-height: 1.6;
-  color: #f5f5f5;
+  color: #f9f6f6;
 }
 .btn {
   color: #fff;
@@ -153,6 +153,7 @@ body h3 {
   display: flex;
   justify-content: center;
   align-items: center;
+  margin: 0;
   font-size: 30px;
   font-weight: 600;
 }
@@ -164,14 +165,37 @@ body h3 {
   color: #f5f5f5;
   max-width: 950px;
   margin: 0 auto;
+}
+.text-nosotros {
+  transform: translate(100px, 0);
+  margin: 0 auto;
+}
+.info-nosotros {
   display: flex;
+  flex-direction: column;
+  text-align: right;
+  margin: 0 auto;
+}
+.title-nosotros {
+  transform: translate(120px, 0);
+  margin: 0 auto;
+}
+.info-porque-elegirnos {
+  display: flex;
+  justify-content: flex-end;
   align-items: center;
+  transform: translate(-130px, 0);
+  margin: 0 auto;
+}
+
+section {
+  padding: 100px 0;
 }
 
 .contenedor-tarjetas {
   font-family: 'Poppins', sans-serif;
   font-weight: 300;
-  color: #fafafa;
+  color: #f8f7f7;
   display: flex;
   justify-content: flex-end;
   gap: 20px;       
@@ -198,14 +222,20 @@ body h3 {
   font-size: 15px;
 }
 
+
 .tarjetas-servicios {
   justify-content: flex-start;
+  transform: translate(0, 50px);
+  margin: 0 auto;
 }
-.tarjetas-servicios h3 {
-  display: flex;
-  justify-self: flex-start;
+.title-servicios {
+  transform: translate(-200px, +35px);
+  margin: 0 auto;
 }
-
+.text-servicios {
+  transform: translate(-140px, +40px);
+  margin: 0 auto;
+}
 
 
 .desarrollo-web {
@@ -230,5 +260,6 @@ footer {
   background-color: #090909;
   min-height: 50vh;
   display: flex;
-  align-items: center;
+  align-items: space-around;
+  padding: 90px 0;
 }
