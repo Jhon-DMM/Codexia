@@ -22,16 +22,15 @@
   height: 65px;
 }
 
-.logo {
-  right: 0;
-  gap: 20px;
-}
-.logo {
+.titulo {
   color: #7a1188;
-  font-size: 20px;
+  font-size: 13px;
+  font-weight: lighter;
+  font-family: 'Poppins', sans-serif;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  transform: translate(15px, 0);
   padding: 0 20px;
 }
 .lista-menu ul{
@@ -98,10 +97,10 @@
 .hero::before {
   content: '';
   position: absolute;
-  width: 900px;
-  height: 900px;
-  bottom: -300px;
-  right: -300px;
+  width: 600px;
+  height: 600px;
+  bottom: -80px;
+  right: -80px;
   background: radial-gradient(circle, rgba(107, 33, 168, 0.9) 0%, rgba(76, 29, 149, 0.1) 50%, transparent 70%);
   filter: blur(120px);
   pointer-events: none;
@@ -119,20 +118,43 @@
   pointer-events: none;
   z-index: -1;
 }
+.hero .logo {
+  position: absolute;
+  width: 250px;
+  height: 250px;
+  top: 130px;
+  left: 30px;
+}
 .hero-text {
-  font-size: 20px
+  font-size: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 .hero-image {
   width: 55%;
+  position:relative;
   display: flex;
   justify-content: center;
   align-items: center;
   filter: drop-shadow(0 0 35px rgba(150,0,255,.35));
 
 }
+.hero-image::before{
+  content:"";
+  position:absolute;
+  width:450px;
+  height:450px;
+  background: radial-gradient(circle, rgba(170,70,255,.35), transparent 70%);
+  filter: blur(80px);
+  filter:drop-shadow(0 20px 60px rgba(160,50,255,.25));
+  z-index:-1;
+}
 .hero-image img {
   width: 95%;
-  max-width: 550px;
+  max-width: 540px;
+  filter:brightness(.9)saturate(1.2);
+  transform: translateY(-20px);
 }
 .hero h2 {
   color: #7a1188;
@@ -140,11 +162,12 @@
   font-size: 60px;
   font-weight: 600;
   margin: 0;
+  transform: translate(0, 40px);
 
 }
 .hero p {
-    font-size: 20px;
-    max-width: 600px;
+  font-size: 20px;
+  max-width: 600px;
 }
 
 p {
@@ -167,11 +190,12 @@ p {
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
   transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
   border-radius: 3px;
+  background: linear-gradient(90deg,#31103d,#410359);
 }
 .hero .btn:hover {
-  transform: translateY(-5px);
+  transform:translateY(-5px) scale(1.03);
   box-shadow: 0 6px 60px rgba(0, 0, 0, 2);
-  border-color: #7813d6;
+  border-color: #31053e;
   background-color: #1b0233;
 }
 body {
