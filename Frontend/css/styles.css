@@ -310,6 +310,24 @@ section {
   background-color: #09000a;
   text-align: center;
 }
+.tarjetas-servicios .tarjeta p {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.tarjetas-servicios .tarjeta h4 {
+  transform: translateY(80px);
+  transition: transform 0.3s ease;
+}
+.tarjeta:hover p {
+  opacity: 1;
+  transform: translateY(0);
+}
+.tarjeta:hover h4 {
+  transform: translateY(0);
+}
+
+
 
 footer {
   color: rgb(250, 251, 252);
