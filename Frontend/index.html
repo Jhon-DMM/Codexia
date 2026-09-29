@@ -36,18 +36,42 @@
 
   <main>
     <section id="hero" class="hero">
-      <div class="hero-text">
+      <div class="hero-fondo" aria-hidden="true">
+        <div class="hero-estrellas"></div>
+        <div class="hero-blob hero-blob-1"></div>
+        <div class="hero-blob hero-blob-2"></div>
+        <svg class="hero-cinta" viewBox="0 0 1600 700" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="cintaFade" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="var(--purple-main)" stop-opacity="0" />
+              <stop offset="30%" stop-color="var(--purple-accent)" stop-opacity="0.9" />
+              <stop offset="55%" stop-color="var(--purple-light)" stop-opacity="1">
+                <animate attributeName="offset" values="35%;65%;35%" dur="3s" repeatCount="indefinite" />
+              </stop>
+              <stop offset="80%" stop-color="var(--purple-main)" stop-opacity="0.6" />
+              <stop offset="100%" stop-color="var(--purple-dark)" stop-opacity="0" />
+            </linearGradient>
+          </defs>
+          <g class="hero-cinta-grupo">
+            <path d="M -50,650 C 250,750 350,350 650,420 S 1050,150 1650,80"
+                  fill="none" stroke="var(--purple-main)" stroke-width="60" stroke-linecap="round"
+                  opacity="0.12" style="filter: blur(30px);" />
+            <path d="M -50,650 C 250,750 350,350 650,420 S 1050,150 1650,80"
+                  fill="none" stroke="var(--purple-accent)" stroke-width="24" stroke-linecap="round"
+                  opacity="0.25" style="filter: blur(12px);" />
+            <path d="M -50,650 C 250,750 350,350 650,420 S 1050,150 1650,80"
+                  fill="none" stroke="url(#cintaFade)" stroke-width="2.5" stroke-linecap="round" />
+          </g>
+        </svg>
+      </div>
+      <div class="hero-content">
         <img class="logo" src="./img/logo-codexia.png" alt="logo">
         <h2>Codexia</h2>
         <p>
           Transformamos ideas en soluciones digitales.
         </p>
-        <a href="#servicios" class="btn">conoce nuestros servicios</a>
+        <a href="/es/asistente.ia/" class="btn">Habla con nuestra ia</a>
       </div>
-      <div class="hero-image">
-        <img src="./img/img-codexia.png" alt=" laptop con codigo">
-      </div>
-
     </section>
     <section id="nosotros" class="nosotros">
      <div class="info-nosotros">
@@ -156,30 +180,31 @@
 
     </section>
   </main>
-  <script src="./js/calculos.js"></script>
   <footer id="contacto">
   <div class="contenedor-footer">
-    <div class="footer-block">
       <h4>Codexia</h4>
       <p>
         Transformamos ideas en soluciones digitales.
       </p>
-    </div>
-    <div class="footer-block">
-       <h4>Contacto</h4>
-       <p>📧 jhonsitomondragon12@gmail.com</p>
-       <p>📱 3175036374</p>
-       <p>📍 Colombia</p>
-
-    </div class="footer-block">
     <p>
       &copy; 2026 Codexia. 
     </p>
     <p>
       Todos los derechos reservados.
     </p>
-    </div>
+  </div>
+  <div class="footer-links">
+    <a href="https://github.com/Jhon-DMM" target="_blank"          class="social-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"></path><path d="M9 18c-4.51 2-5-2-7-2"></path></svg>
+    </a>
+    <a href="https://wa.me/573175036274?text=Hola%20!%20Quiero%20saber%20más%20sobre%20tus%20servicio."  target="_blank" class="social-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+    </a>
+    <a href="mailto:jhxnmondragon@gmail.com" class="social-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path></svg>
+    </a>
   </div>
 </footer>
+  <script src="./js/calculos.js"></script>
 </body>
 </html>

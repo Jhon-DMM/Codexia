@@ -1,63 +1,28 @@
-//Mi hoja de calculos
+document.addEventListener("DOMContentLoaded", () => {
+  const sectionsLeft = document.querySelectorAll('#nosotros, #porque-elegirnos');
+  const sectionsRight = document.querySelectorAll('#servicios');
 
-console.log("Codexia Ds");
+  // Asigno clases iniciales
+  sectionsLeft.forEach(section => section.classList.add('slide-left'));
+  sectionsRight.forEach(section => section.classList.add('slide-right'));
 
-/*
-    FUNCIÓN 1
-    Calcula el precio de un producto después de aplicar un descuento.
-*/
-function calcularPrecioConDescuento(precio, procentajeDescuento){
-    const valorDescuento = precio * (procentajeDescuento /100 );
-    const preciofinal = precio - valorDescuento;
-    return preciofinal;
-}
+  const observerOptions = {
+    root: null,
+    rootMargin: '0px 0px -50px 0px', // Se activa un poco antes de llegar al borde inferior
+    threshold: 0.05 // Solo necesita que el 5% de la sección sea visible para animarse
+  };
 
-/*
-    FUNCIÓN 2
-    Calcula el precio de un producto después de agregar un impuesto.
-*/
-function calcularPrecioConImpuesto(precio, porcentajeImpuesto) {
-    const valorImpuesto = precio * (porcentajeImpuesto / 100);
-    const precioFinal = precio + valorImpuesto;
+  const sectionObserver = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('show');
+      } else {
+        // Al quitar la clase 'show', la animación se reinicia cuando haces scroll hacia arriba
+        entry.target.classList.remove('show');
+      }
+    });
+  }, observerOptions);
 
-    return precioFinal;
-}
-
-/*
-    FUNCIÓN 3
-    Calcula el total de un pedido teniendo en cuenta:
-    precio unitario, cantidad de productos y costo de envío.
-*/
-
-function calcularTotalPedido(precioUnitario, cantidad, costoEnvio) {
-    if(cantidad > 5){
-        costoEnvio = 0;
-        console.log("El envío es gratis por comprar más de 5 productos");
-    }
-    const subtotal = precioUnitario * cantidad;
-    let totalPedido = subtotal + costoEnvio;
-    if(totalPedido > 100000){
-       totalPedido = calcularPrecioConDescuento(totalPedido, 10);
-        console.log("¡Felicidades! Has superado el umbral de $100,000 en tu pedido.");
-    }
-    return totalPedido;
-}
-
-const precioDescuento = calcularPrecioConDescuento(100000,50);
-console.log("El precio con descuento es: " + precioDescuento);
-
-const resultadoPedido = calcularTotalPedido(150000, 6, 5000);
-console.log("Total del pedido:" + resultadoPedido);
-
-const precioImpuesto = calcularPrecioConImpuesto(100000, 10);
-console.log("El precio con impuesto es: " + precioImpuesto);
-
-// funcion 4
-
-function ahorroanual(costosemanal, semanas){
-    let ahorroanual = costosemanal * semanas;
-    return ahorroanual;
-}
-
-let resultadoAhorro = ahorroanual(10000, 52);
-console.log("El ahorro anual es: " + resultadoAhorro);
+  const hiddenElements = document.querySelectorAll('.slide-left, .slide-right');
+  hiddenElements.forEach(el => sectionObserver.observe(el));
+});
