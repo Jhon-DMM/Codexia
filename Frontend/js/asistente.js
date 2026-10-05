@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   const nuevoMensaje = document.createElement('p');
+  nuevoMensaje.className = 'mensaje-usuario';
   nuevoMensaje.textContent = "Tú: " + mensaje;
   chat.appendChild(nuevoMensaje);
   
@@ -40,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
   
     const mensajeError = document.createElement('p');
     mensajeError.textContent = "Asistente: Lo siento, hubo un error al procesar tu mensaje. Inténtalo de nuevo.";
-    mensajeError.style.color = 'red';
+    mensajeError.className = 'mensaje-error';
     chat.appendChild(mensajeError);
   }
 }

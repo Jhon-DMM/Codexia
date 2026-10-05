@@ -4,8 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Asistente de IA | Codexia</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../css/styles.css">
 </head>
-<body>
+<body class="pagina-chat">
   <main>
     <h1>Asistente de IA | Codexia</h1>
     <div class="chat">
@@ -14,12 +18,12 @@
         Holi, ¿en que te ayudo?.
       </p>
     </div>
-    <div>
+    <div class="entrada">
       <input 
       type="text"
       id="mensaje" 
       placeholder="Escribe tu mensaje">
-      <button id="enviar">Enviar</button>
+      <button id="enviar" class="btn">Enviar</button>
     </div>
   </main>
   <script src="../../js/asistente.js"></script>

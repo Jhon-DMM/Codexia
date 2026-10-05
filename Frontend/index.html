@@ -5,181 +5,132 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Codexia</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Playwrite+ID:wght@100..400&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./css/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/styles.css">
 </head>
 
 <body>
+  <!-- Fondo Cósmico Avanzado -->
+<div id="background-cosmico" class="background-cosmico">
+  <!-- El gran resplandor difuso del fondo -->
+  <div class="halo-aurora"></div>
+  
+  <!-- El planeta / eclipse central detrás del texto -->
+  <div class="planeta-eclipse"></div>
+</div>
   <header class="encabezado">
-    <div class="titulo">
-      <h1>Tu idea, una realidad</h1>
-    </div>
-    <nav class="lista-menu">
-      <ul>
-        <li>
-          <a href="#hero" class="menu">inicio</a>
-        </li>
-        <li>
-          <a href="#nosotros" class="menu">nosotros</a>
-        </li>
-        <li>
-          <a href="#servicios" class="menu">servicios</a>
-        </li>
-        <li>
-          <a href="#contacto" class="menu">contacto</a>
-        </li>
-      </ul>
+    <h1 class="eslogan">Tu idea, una realidad</h1>
+    <nav class="menu-pildora" aria-label="Principal">
+      <a href="#background-cosmico" class="menu">inicio</a>
+      <a href="#nosotros" class="menu">nosotros</a>
+      <a href="#servicios" class="menu">servicios</a>
+      <a href="#porque-elegirnos" class="menu">porque elegirnos</a>
     </nav>
+    <a href="#" class="btn btn-login">Iniciar sesión</a>
   </header>
 
   <main>
+    <!-- Hero -->
     <section id="hero" class="hero">
       <div class="hero-fondo" aria-hidden="true">
         <div class="hero-estrellas"></div>
-        <div class="hero-blob hero-blob-1"></div>
-        <div class="hero-blob hero-blob-2"></div>
-        <svg class="hero-cinta" viewBox="0 0 1600 700" preserveAspectRatio="none">
-          <defs>
-            <linearGradient id="cintaFade" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stop-color="var(--purple-main)" stop-opacity="0" />
-              <stop offset="30%" stop-color="var(--purple-accent)" stop-opacity="0.9" />
-              <stop offset="55%" stop-color="var(--purple-light)" stop-opacity="1">
-                <animate attributeName="offset" values="35%;65%;35%" dur="3s" repeatCount="indefinite" />
-              </stop>
-              <stop offset="80%" stop-color="var(--purple-main)" stop-opacity="0.6" />
-              <stop offset="100%" stop-color="var(--purple-dark)" stop-opacity="0" />
-            </linearGradient>
-          </defs>
-          <g class="hero-cinta-grupo">
-            <path d="M -50,650 C 250,750 350,350 650,420 S 1050,150 1650,80"
-                  fill="none" stroke="var(--purple-main)" stroke-width="60" stroke-linecap="round"
-                  opacity="0.12" style="filter: blur(30px);" />
-            <path d="M -50,650 C 250,750 350,350 650,420 S 1050,150 1650,80"
-                  fill="none" stroke="var(--purple-accent)" stroke-width="24" stroke-linecap="round"
-                  opacity="0.25" style="filter: blur(12px);" />
-            <path d="M -50,650 C 250,750 350,350 650,420 S 1050,150 1650,80"
-                  fill="none" stroke="url(#cintaFade)" stroke-width="2.5" stroke-linecap="round" />
-          </g>
-        </svg>
       </div>
       <div class="hero-content">
         <img class="logo" src="./img/logo-codexia.png" alt="logo">
-        <h2>Codexia</h2>
-        <p>
-          Transformamos ideas en soluciones digitales.
-        </p>
-        <a href="/es/asistente.ia/index.html" class="btn">Habla con nuestra ia</a>
+        <h2 class="hero-titulo">Codexia</h2>
+        <p>Transformamos ideas en soluciones digitales.</p>
+        <div class="hero-acciones">
+          <a href="./es/asistente.ia/index.html" class="btn">Habla con nuestra asistente de IA</a>
+          <a href="https://wa.me/573175036274?text=Hola%20!%20Quiero%20saber%20más%20sobre%20tus%20servicio." target="_blank" rel="noopener" class="btn btn-fantasma">Escríbenos por WhatsApp</a>
+        </div>
       </div>
     </section>
-    <section id="nosotros" class="nosotros">
-     <div class="info-nosotros">
-       <h3 class="title-nosotros">Creamos con propósito</h3>
-       <p class="text text-nosotros">
-        Somos una empresa de desarrollo de software con un propósito claro:
-        crear soluciones digitales que ayuden a las empresas a mejorar su rendimiento y
-        a lograr sus objetivos.
-       </p>
-     </div>
-      <div class="contenedor-tarjetas">
-        <div class="tarjeta innovacion">
-          <h4>Innovación</h4>
-          <p>
-            buscamos soluciones modernas para cada proyecto.
-          </p>
-        </div>
-        <div class="tarjeta">
-          <h4>Calidad</h4>
-          <p>
-            cuidamos cada detalle para entregar productos confiables.
-          </p>
-        </div>
-        <div class="tarjeta">
-          <h4>Compromiso</h4>
-          <p>
-            trabajamos de la mano de nuestros clientes, para que entender sus necesidades y ofrecer soluciones a su medida.
-          </p>
-        </div>
-        <div class="tarjeta">
-          <h4>Seguridad</h4>
-          <p>
-            diseñamos pensando en la protección de la información.
-          </p>
-        </div>
-      </div>
 
-    </section>
-    <section id="servicios" class="servicios">
-      <div class="info-servicios">
-        <h3 class="title-servicios">Nuestras capacidades técnicas</h3>
-        <p class="text  text-servicios">
-          ofrecemos una gama diversa de servicios para satisfacer las necesidades de nuestros clientes.
-        </p>  
+    <!-- Nosotros -->
+    <section id="nosotros" class="seccion seccion-nosotros">
+      <div class="contenido">
+        <div class="seccion-titulo">
+          <h3>Creamos con propósito</h3>
+          <p class="text">
+            Somos una empresa de desarrollo de software con un propósito claro:
+            crear soluciones digitales que ayuden a las empresas a mejorar su rendimiento y
+            a lograr sus objetivos.
+          </p>
+        </div>
+        <ul class="lista">
+          <li><span class="num">01</span><h4>Innovación</h4><p>buscamos soluciones modernas para cada proyecto.</p></li>
+          <li><span class="num">02</span><h4>Calidad</h4><p>cuidamos cada detalle para entregar productos confiables.</p></li>
+          <li><span class="num">03</span><h4>Compromiso</h4><p>trabajamos de la mano de nuestros clientes, para que entender sus necesidades y ofrecer soluciones a su medida.</p></li>
+          <li><span class="num">04</span><h4>Seguridad</h4><p>diseñamos pensando en la protección de la información.</p></li>
+        </ul>
       </div>
-      <div class="contenedor-tarjetas tarjetas-servicios">
-          <div class="tarjeta desarrollo-web">
-          <h4>Desarrollo web</h4>
-          <p>
-            Diseñamos sitios web, de forma en que sean modernos, rápidos y adaptados a cualquier dispositivo.
-          </p>
-        </div>
-        <div class="tarjeta desarrollo-software">
-          <h4>Desarrollo de software</h4>
-          <p>
-            Creamos soluciones de software personalizadas para optimizar procesos y mejorar la productividad.
-          </p>
-        </div>
-        <div class="tarjeta ciberseguridad">
-          <h4>Ciberseguridad</h4> 
-          <p>
-            Protegemos la información y fortalecemos la seguridad de los sistemas frente a amenazas digitales.
-          </p>
-        </div>
-        <div class="tarjeta inteligencia-artificial">
-          <h4>Inteligencia artificial</h4>
-          <p>
-            Implementamos soluciones basadas en IA para automatizar tareas y potenciar la toma de decisiones.
-          </p>
-        </div>
-      </div>       
-    </section>
-    <section id="porque-elegirnos" class="porque-elegirnos">
-      <div class="info-porque-elegirnos">
-        <h3>Tu éxito, respaldado por nuestra ingeniería</h3>
-      </div>
-      <div class="contenedor-tarjetas">
-        <div class="tarjeta">
-          <h4>Tecnología moderna</h4>
-          <p>
-            trabajamos con herramientas actuales y soluciones escalables.
-          </p>
-        </div>
-        <div class="tarjeta">
-          <h4>Atención personalizada</h4>
-          <p>
-            cada detalle se ajusta a las necesidades y expectativas de nuestros clientes.
-          </p>
-        </div>
-        <div class="tarjeta">
-          <h4>Seguridad desde el inicio</h4>
-          <p>
-            la protección de los datos forma parte del desarrollo, no es un añadido.
-            </p>
-        </div>
-        <div class="tarjeta">
-          <h4>Enfoque en resultado</h4>
-          <p>
-            buscamos crear soluciones que aporten valor real al negocio.
-          </p>
-        </div>
-
-      </div>
-
     </section>
 
+    <!-- Servicios -->
+    <section id="servicios" class="seccion seccion-servicios">
+      <div class="contenido">
+        <div class="seccion-titulo">
+          <h3>Nuestras capacidades técnicas</h3>
+          <p class="text">ofrecemos una gama diversa de servicios para satisfacer las necesidades de nuestros clientes.</p>
+        </div>
+        <ul class="lista lista-servicios">
+          <li>
+            <svg class="icono" viewBox="0 0 24 24" aria-hidden="true"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6" /></svg>
+            <div><h4>Desarrollo web</h4><p>Diseñamos sitios web, de forma en que sean modernos, rápidos y adaptados a cualquier dispositivo.</p></div>
+          </li>
+          <li>
+            <svg class="icono" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2" /><path d="M3 9h18M8 4v5" /></svg>
+            <div><h4>Desarrollo de software</h4><p>Creamos soluciones de software personalizadas para optimizar procesos y mejorar la productividad.</p></div>
+          </li>
+          <li>
+            <svg class="icono" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z" /></svg>
+            <div><h4>Ciberseguridad</h4><p>Protegemos la información y fortalecemos la seguridad de los sistemas frente a amenazas digitales.</p></div>
+          </li>
+          <li>
+            <svg class="icono" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2 2M16 16l2 2M18 6l-2 2M8 16l-2 2" /></svg>
+            <div><h4>Inteligencia artificial</h4><p>Implementamos soluciones basadas en IA para automatizar tareas y potenciar la toma de decisiones.</p></div>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Asistente de IA -->
+    <section id="asistente" class="seccion seccion-asistente">
+      <div class="contenido asistente-grid">
+        <div>
+          <h3>Habla con nuestra asistente de IA</h3>
+          <p class="text">Antes de escribirnos, conversa con ella: te ayuda a poner en palabras lo que tienes en mente y a conocer cómo trabajamos.</p>
+          <ul class="lista lista-razones">
+            <li><h4>Aclara tu idea</h4><p>Te hace preguntas que ayudan a definir qué necesitas, para quién y con qué alcance.</p></li>
+            <li><h4>Conoce la empresa</h4><p>Resuelve tus dudas sobre nuestros servicios y nuestra forma de trabajar.</p></li>
+            <li><h4>Llega con una base clara</h4><p>Tu proyecto queda más definido antes de la primera conversación con el equipo.</p></li>
+          </ul>
+        </div>
+        <div class="asistente-chat">
+          <div class="chat-ejemplo" role="img" aria-label="Ejemplo de conversación con la asistente">
+            <p class="burbuja burbuja-usuario">Quiero una app para mi negocio, pero aún no sé por dónde empezar.</p>
+            <p class="burbuja burbuja-ia">Cuéntame: ¿qué problema quieres resolver y quién la usaría?</p>
+          </div>
+          <a href="./es/asistente.ia/index.html" class="btn">Habla con nuestra asistente de IA</a>
+        </div>
+    </section>
+
+    <!-- Por qué elegirnos -->
+    <section id="porque-elegirnos" class="seccion seccion-porque">
+      <div class="contenido">
+        <div class="seccion-titulo"><h3>Tu éxito, respaldado por nuestra ingeniería</h3></div>
+        <ul class="lista lista-puntos">
+          <li><h4>Tecnología moderna</h4><p>trabajamos con herramientas actuales y soluciones escalables.</p></li>
+          <li><h4>Atención personalizada</h4><p>cada detalle se ajusta a las necesidades y expectativas de nuestros clientes.</p></li>
+          <li><h4>Seguridad desde el inicio</h4><p>la protección de los datos forma parte del desarrollo, no es un añadido.</p></li>
+          <li><h4>Enfoque en resultado</h4><p>buscamos crear soluciones que aporten valor real al negocio.</p></li>
+        </ul>
+      </div>
     </section>
   </main>
+
   <footer id="contacto">
   <div class="contenedor-footer">
       <h4>Codexia</h4>
