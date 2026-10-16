@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
     estrella.className = "estrella";
     estrella.style.left = `${azar(0, 100)}%`;
     estrella.style.top = `${azar(0, 100)}%`;
-    estrella.style.setProperty("--tam", `${azar(1.5, 3.5)}px`);
+    estrella.style.setProperty("--tam", `${azar(0.8, 2.1)}px`);
     estrella.style.setProperty("--dur", `${azar(4, 8)}s`);
     estrella.style.setProperty("--dx", `${azar(-160, 160)}px`);
     estrella.style.setProperty("--dy", `${azar(-120, 120)}px`);
