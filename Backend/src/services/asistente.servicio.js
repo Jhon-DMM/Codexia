@@ -2,7 +2,7 @@ const OpenAI = require('openai');
 const { CONTEXTO_CODEXIA } = require('../config/asistente.config');
 
 const client = new OpenAI({
-    baseURL: process.env.BASE_URL,
+    baseURL: process.env.GROQ_BASE_URL || process.env.BASE_URL,
     apiKey: process.env.GROQ_API_KEY
 });
 
@@ -17,7 +17,7 @@ const obtenerRespuestaGroq = async (mensajeUsuario, historial = []) => {
     try {
         
         const chatCompletion = await client.chat.completions.create({
-            model: process.env.OpenAI_API_VERSION,
+            model: process.env.GROQ_MODEL || process.env.OpenAI_API_VERSION,
             messages: [
                 {
                     role: "system",

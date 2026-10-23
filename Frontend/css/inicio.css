@@ -1,47 +1,4 @@
-/* 1. Variables */
-:root {
-  --void: #030014;
-  --midnight: #060317;
-  --indigo: #10093a;
-  --lilac: #f4f0ff;
-  --ash: #a8a6b7;
-  --fog: #918ea0;
-  --accent: #9382ff;
-  --iris: #5046e4;
-  --cosmic: linear-gradient(90deg, #e59cff, #ba9cff 50%, #9cb2ff);
-  --glow: inset 0 0 24px rgba(255, 255, 255, 0.04);
-  --glow-violeta: inset 0 -7px 11px rgba(164, 143, 255, 0.12);
-  --font-display: "DM Sans", "Inter", system-ui, sans-serif;
-  --font-body: "Inter", system-ui, sans-serif;
-  --ancho-contenido: 880px;
-}
-
-/* 2. Base */
-*, *::before, *::after { box-sizing: border-box; }
-html { scroll-behavior: smooth;}
-body {
-  margin: 0;
-  background: var(--void);
-  color: var(--lilac);
-  font: 400 1rem/1.5 var(--font-body);
-  overflow-x: hidden;
-}
-/* Fondo con profundidad: resplandores violeta fijos tras todo el contenido */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background:
-    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(80, 70, 228, 0.3), transparent),
-    radial-gradient(ellipse 50% 40% at 95% 45%, rgba(147, 130, 255, 0.12), transparent),
-    radial-gradient(ellipse 50% 40% at 5% 80%, rgba(229, 156, 255, 0.09), transparent);
-}
-h1, h2, h3, h4 { margin: 0; font-family: var(--font-display); font-weight: 500; color: var(--lilac); }
-p { margin: 0; }
-a { color: inherit; text-decoration: none; }
-:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 5px; }
+/* Estilos de la página principal */
 
 /* Contenedor principal del fondo */
 .background-cosmico {
@@ -155,31 +112,8 @@ a { color: inherit; text-decoration: none; }
 }
 .menu { font-size: 0.9rem; text-transform: capitalize; transition: color 0.3s; }
 .menu:hover { color: var(--accent); }
-
-/* 4. Botones */
-.btn {
-  display: inline-block;
-  padding: 10px 16px;
-  border: 0;
-  border-radius: 5px;
-  background: var(--indigo);
-  color: var(--lilac);
-  font: 500 0.95rem var(--font-body);
-  cursor: pointer;
-  box-shadow: var(--glow-violeta), var(--glow);
-  transition: background 0.3s, color 0.3s;
-}
-.btn:hover { background: #1a1160; color: #fff; }
 .btn-login { grid-area: login; justify-self: end; background:rgba(31, 1, 65, 0.8); color: #fff; }
 .btn-login:hover { background: #330e5b; }
-.btn-fantasma {
-  background: rgba(255, 255, 255, 0.06);
-  box-shadow: none;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  backdrop-filter: blur(8px);
-}
-.btn-fantasma:hover { background: rgba(255, 255, 255, 0.12); }
-
 /* 5. Hero */
 .hero {
   position: relative;
@@ -307,15 +241,6 @@ footer { padding: 64px 20px 48px; }
   50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
 }
 @keyframes girar { to { transform: rotate(360deg); } }
-@keyframes puntos-esperando {
-  0%, 80%, 100% { opacity: 0.25; transform: translateY(0); }
-  40% { opacity: 1; transform: translateY(-2px); }
-}
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation: none !important; }
-  .reveal { opacity: 1; transform: none; transition: none; }
-}
-
 /* Estrellas fugaces generadas por js/estrellas.js */
 .estrellas { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
 .estrella {
@@ -334,55 +259,10 @@ footer { padding: 64px 20px 48px; }
   100% { opacity: 0; transform: translate(var(--dx), var(--dy)); }
 }
 
-/* 11. Página del asistente */
-.pagina-chat main { max-width: 720px; margin: 0 auto; padding: 64px 20px; }
-.pagina-chat h1 { margin-bottom: 24px; font-size: clamp(1.75rem, 6vw, 2rem); line-height: 1.25; }
-.chat { display: flex; flex-direction: column; gap: 12px; min-height: 320px; max-height: 60vh; overflow-y: auto; padding: 24px; background: var(--midnight); border-radius: 16px; box-shadow: var(--glow); }
-.chat strong { font-size: 0.9rem; font-weight: 500; color: var(--accent); }
-.chat p { font-size: 0.95rem; line-height: 1.6; color: var(--ash); }
-.chat .mensaje-burbuja { max-width: 85%; padding: 10px 14px; border-radius: 16px; font-size: 0.95rem; line-height: 1.6; }
-.chat .mensaje-usuario { align-self: flex-end; background: var(--indigo); color: var(--lilac); }
-.chat .mensaje-asistente { align-self: flex-start; background: rgba(255, 255, 255, 0.05); color: var(--ash); }
-.chat .mensaje-error {
-  align-self: flex-start;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px;
-  background: rgba(147, 130, 255, 0.08);
-  color: var(--fog);
-}
-.chat .mensaje-procesando {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-.puntos-procesando {
-  display: inline-flex;
-  min-width: 1.8em;
-}
-.puntos-procesando span {
-  animation: puntos-esperando 1.2s infinite ease-in-out;
-  opacity: 0.25;
-}
-.puntos-procesando span:nth-child(2) { animation-delay: 0.2s; }
-.puntos-procesando span:nth-child(3) { animation-delay: 0.4s; }
-.entrada { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
-.entrada input { flex: 1; min-width: 0; padding: 10px 14px; background: var(--midnight); color: var(--lilac); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 5px; font: 400 0.95rem var(--font-body); }
-.entrada input::placeholder { color: var(--fog); }
-.entrada input:disabled,
-.entrada .btn:disabled {
-  opacity: 0.65;
-  cursor: wait;
-}
-.entrada .btn { white-space: nowrap; }
-.btn-reintentar {
-  padding: 6px 10px;
-  font-size: 0.85rem;
-  line-height: 1.2;
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
 }
 
-/* 12. Responsive */
 @media (min-width: 768px) {
   .encabezado { grid-template-columns: 1fr auto 1fr; grid-template-areas: "eslogan menu login"; }
   .menu-pildora { gap: 28px; padding-inline: 24px; }
@@ -398,7 +278,6 @@ footer { padding: 64px 20px 48px; }
   .hero-content p { font-size: 1.5rem; }
   .logo { max-width: 140px; }
 }
-
 /* Contenedor principal del fondo */
 .background-cosmico {
   position: absolute;

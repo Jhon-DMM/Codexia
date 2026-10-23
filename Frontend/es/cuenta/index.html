@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tu cuenta | Codexia</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../css/base.css">
+  <link rel="stylesheet" href="../../css/cuenta.css">
+</head>
+<body class="pagina-cuenta">
+  <main class="cuenta-panel">
+    <a class="cuenta-volver" href="../../index.html">← Volver a Codexia</a>
+    <h1>Tu espacio en Codexia</h1>
+    <p class="cuenta-intro">Inicia sesión o crea una cuenta para conversar con nuestra asistente.</p>
+
+    <div class="cuenta-pestanas" role="tablist" aria-label="Acceso a tu cuenta">
+      <button type="button" class="cuenta-pestana activa" id="pestana-login" role="tab" aria-selected="true">Iniciar sesión</button>
+      <button type="button" class="cuenta-pestana" id="pestana-registro" role="tab" aria-selected="false">Crear cuenta</button>
+    </div>
+
+    <form id="form-login" class="cuenta-form">
+      <label for="login-correo">Correo electrónico</label>
+      <input id="login-correo" name="correo" type="email" autocomplete="email" maxlength="255" required>
+      <label for="login-password">Contraseña</label>
+      <input id="login-password" name="password" type="password" autocomplete="current-password" required>
+      <button class="btn" type="submit">Entrar al asistente</button>
+    </form>
+
+    <form id="form-registro" class="cuenta-form" hidden>
+      <label for="registro-nombre">Nombre</label>
+      <input id="registro-nombre" name="nombre" type="text" autocomplete="name" maxlength="100" required>
+      <label for="registro-correo">Correo electrónico</label>
+      <input id="registro-correo" name="correo" type="email" autocomplete="email" maxlength="255" required>
+      <label for="registro-password">Contraseña (mínimo 8 caracteres)</label>
+      <input id="registro-password" name="password" type="password" autocomplete="new-password" minlength="8" required>
+      <button class="btn" type="submit">Crear cuenta y continuar</button>
+    </form>
+
+    <p id="cuenta-mensaje" class="cuenta-mensaje" role="status" aria-live="polite"></p>
+    <p class="cuenta-nota">El asistente permite hasta 30 mensajes por día. Tus conversaciones quedan guardadas en tu cuenta.</p>
+  </main>
+  <script src="../../js/cuenta.js"></script>
+</body>
+</html>

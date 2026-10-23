@@ -10,22 +10,32 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@500&family=Inter:wght@400;500&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="../../css/styles.css">
+  <link rel="stylesheet" href="../../css/base.css">
+  <link rel="stylesheet" href="../../css/asistente.css">
 </head>
 
 <body class="pagina-chat">
   <main>
-    <h1>Asistente de IA | Codexia</h1>
-    <div class="chat">
-      <strong>Asistente | Codexia</strong>
-      <p>
-        Holi, ¿en que te ayudo?.
-      </p>
+    <div class="chat-encabezado">
+      <div>
+        <h1>Asistente de IA | Codexia</h1>
+        <p>Hola, <span id="nombre-usuario"></span></p>
+      </div>
+      <button id="cerrar-sesion" class="btn btn-fantasma" type="button">Cerrar sesión</button>
     </div>
+    <p id="cuota-diaria" class="cuota-diaria" aria-live="polite"></p>
+    <nav class="historial-conversaciones" aria-label="Mis conversaciones">
+      <div class="historial-encabezado">
+        <h2>Mis conversaciones</h2>
+        <button id="nueva-conversacion" class="btn btn-fantasma" type="button">Nueva conversación</button>
+      </div>
+      <div id="lista-conversaciones" class="lista-conversaciones"></div>
+    </nav>
+    <div class="chat" role="log" aria-live="polite" aria-relevant="additions text"></div>
     <div class="entrada">
-      <input type="text" id="mensaje" placeholder="Escribe tu mensaje">
-      <button id="enviar" class="btn">Enviar</button>
-      <button id="reiniciar-chat" class="btn btn-fantasma" type="button">Reiniciar chat</button>
+      <label class="texto-oculto" for="mensaje">Tu mensaje para la asistente</label>
+      <input type="text" id="mensaje" placeholder="Escribe tu mensaje" maxlength="4000" autocomplete="off">
+      <button id="enviar" class="btn" type="button">Enviar</button>
     </div>
   </main>
   <script src="../../js/asistente.js"></script>

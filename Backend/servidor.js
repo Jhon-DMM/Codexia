@@ -1,5 +1,7 @@
 const app = require('./src/app');
 
-app.listen(3000, () => {
-    console.log('Servidor codexia funcionando en http://localhost:3000');
+const puerto = Number(process.env.PORT) || 3000;
+
+app.listen(puerto, () => {
+    console.log(`Servidor Codexia funcionando en http://localhost:${puerto}`);
 });
