@@ -8,6 +8,17 @@ Aplicación web de Codexia con registro e inicio de sesión, conversaciones guar
 - PostgreSQL 13 o superior.
 - Una clave de API del proveedor de IA configurado.
 
+## Inicio local
+
+1. Inicia el servicio de PostgreSQL y confirma que esté disponible en el puerto configurado en `DB_PORT` (por defecto, `5432`).
+2. En una terminal, entra a `Backend` y ejecuta `npm run migrate` para crear las tablas que falten. La migración conserva las tablas existentes.
+3. Ejecuta `npm start` y deja esa terminal abierta mientras uses la aplicación.
+4. Abre `http://localhost:3000/es/cuenta/index.html`. El servidor de Express sirve tanto la página como la API.
+
+Si pruebas solo el frontend con Live Server abierto desde la raíz del repositorio, usa `/Frontend/index.html` como portada; desde la carpeta `Frontend`, la portada es `/index.html`. La redirección de registro e inicio de sesión conserva automáticamente cualquiera de esas dos raíces.
+
+Si sirves el frontend por separado, configura `content` en la etiqueta `meta[name="codexia-api-base-url"]` de las páginas de cuenta y asistente con el origen completo de la API (por ejemplo, `https://api.ejemplo.com`). En desarrollo se aceptan orígenes locales (`localhost` y `127.0.0.1`) en cualquier puerto; en producción configura el origen exacto del frontend en `FRONTEND_ORIGIN` para habilitar CORS con credenciales.
+
 ## Variables de entorno
 
 `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER` y `DB_PASSWORD` configuran PostgreSQL. `GROQ_API_KEY`, `GROQ_BASE_URL` y `GROQ_MODEL` configuran el proveedor del asistente. `ASISTENTE_LIMITE_DIARIO` define la cuota de mensajes por usuario y día; el valor inicial es 30. `FRONTEND_ORIGIN` permite añadir el origen del frontend si se sirve por separado. Cambia el nombre de base de datos del comando de migración para que coincida con `DB_NAME`.
@@ -24,7 +35,7 @@ Cada usuario puede tener varias conversaciones; cada burbuja se guarda como una 
 - `chats`: burbujas de usuario y respuestas del asistente dentro de una conversación.
 - `uso_asistente`: consumo diario por usuario.
 
-Las relaciones y restricciones están en `Backend/database/migrations/001_esquema_inicial.sql`. La migración usa `CREATE TABLE IF NOT EXISTS`: conserva la tabla `usuarios` existente y agrega las tablas que falten. No elimina datos.
+Las relaciones y restricciones están en `Backend/database/migrations/001_esquema_inicial.sql`. Ejecuta `npm run migrate` desde `Backend` después de configurar PostgreSQL. La migración usa `CREATE TABLE IF NOT EXISTS`: conserva la tabla `usuarios` existente y agrega las tablas que falten. No elimina datos.
 
 ## Hojas de estilo
 

@@ -10,13 +10,30 @@ const usuariosRoutes = require('./routes/usuarios.routes');
 
 const app = express();
 
-const origenesPermitidos = (process.env.FRONTEND_ORIGIN || 'http://localhost:5500,http://127.0.0.1:5500,http://localhost:3000,http://127.0.0.1:3000')
+const esProduccion = process.env.NODE_ENV === 'production';
+const origenesPredeterminados = esProduccion
+  ? []
+  : ['http://localhost:5500', 'http://127.0.0.1:5500', 'http://localhost:3000', 'http://127.0.0.1:3000'];
+const origenesConfigurados = (process.env.FRONTEND_ORIGIN || '')
   .split(',')
-  .map((origen) => origen.trim());
+  .map((origen) => origen.trim())
+  .filter(Boolean);
+const origenesPermitidos = new Set([...origenesPredeterminados, ...origenesConfigurados]);
+
+function esOrigenLocal(origen) {
+  if (esProduccion) return false;
+  try {
+    const url = new URL(origen);
+    return ['http:', 'https:'].includes(url.protocol)
+      && ['localhost', '127.0.0.1', '[::1]'].includes(url.hostname);
+  } catch (error) {
+    return false;
+  }
+}
 
 app.use(cors({ origin: (origen, callback) => {
-  if (!origen || origenesPermitidos.includes(origen)) return callback(null, true);
-  const error = new Error('Origen no permitido por CORS');
+  if (!origen || origenesPermitidos.has(origen) || esOrigenLocal(origen)) return callback(null, true);
+  const error = new Error(`Origen no permitido por CORS: ${origen}`);
   error.status = 403;
   return callback(error);
 }, credentials: true }));

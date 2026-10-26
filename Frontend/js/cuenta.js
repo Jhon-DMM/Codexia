@@ -7,18 +7,25 @@ document.addEventListener('DOMContentLoaded', () => {
   const pestañaRegistro = document.getElementById('pestana-registro');
 
   function apiBaseUrl() {
+    const configurada = document.querySelector('meta[name="codexia-api-base-url"]')?.content.trim();
+    if (configurada) return configurada.replace(/\/+$/, '');
+
     const { protocol, hostname, port } = window.location;
     const local = hostname === 'localhost' || hostname === '127.0.0.1';
     if (protocol === 'file:') return 'http://localhost:3000';
-    if (local && port && port !== '3000') return `http://${hostname}:3000`;
+    if (local && port !== '3000') return `http://${hostname}:3000`;
     return '';
   }
 
   function destinoAsistente() {
     const next = new URLSearchParams(window.location.search).get('next');
-    return next && next.startsWith('/') && !next.startsWith('//')
-      ? next
-      : '/es/asistente.ia/index.html';
+    if (next && next.startsWith('/') && !next.startsWith('//')) return next;
+
+    const marcadorCuenta = '/es/cuenta/';
+    const rutaActual = window.location.pathname;
+    const indiceCuenta = rutaActual.lastIndexOf(marcadorCuenta);
+    const raizFrontend = indiceCuenta >= 0 ? rutaActual.slice(0, indiceCuenta) : '';
+    return `${raizFrontend}/es/asistente.ia/index.html`;
   }
 
   function cambiarPestaña(registro) {
@@ -47,7 +54,9 @@ document.addEventListener('DOMContentLoaded', () => {
       sessionStorage.removeItem(conversationKey);
       window.location.assign(destinoAsistente());
     } catch (error) {
-      mensaje.textContent = error.message || 'No fue posible conectar con el servidor. Inténtalo de nuevo.';
+      mensaje.textContent = error instanceof TypeError
+        ? `No se pudo conectar con el servidor (${apiBaseUrl() || window.location.origin}). Comprueba que la API esté iniciada y que el origen de esta página esté permitido por CORS.`
+        : error.message || 'No fue posible completar la solicitud. Inténtalo de nuevo.';
     } finally {
       boton.disabled = false;
     }

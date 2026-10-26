@@ -1,4 +1,5 @@
 /* 1. Variables */
+
 :root {
   --void: #030014;
   --midnight: #060317;
@@ -15,10 +16,16 @@
   --font-body: "Inter", system-ui, sans-serif;
   --ancho-contenido: 880px;
 }
-
 /* 2. Base */
-*, *::before, *::after { box-sizing: border-box; }
-html { scroll-behavior: smooth;}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   margin: 0;
   background: var(--void);
@@ -27,21 +34,37 @@ body {
   overflow-x: hidden;
 }
 /* Fondo con profundidad: resplandores violeta fijos tras todo el contenido */
+
 body::before {
   content: "";
   position: fixed;
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  background:
-    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(80, 70, 228, 0.3), transparent),
-    radial-gradient(ellipse 50% 40% at 95% 45%, rgba(147, 130, 255, 0.12), transparent),
-    radial-gradient(ellipse 50% 40% at 5% 80%, rgba(229, 156, 255, 0.09), transparent);
+  background: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(80, 70, 228, 0.3), transparent), radial-gradient(ellipse 50% 40% at 95% 45%, rgba(147, 130, 255, 0.12), transparent), radial-gradient(ellipse 50% 40% at 5% 80%, rgba(229, 156, 255, 0.09), transparent);
 }
-h1, h2, h3, h4 { margin: 0; font-family: var(--font-display); font-weight: 500; color: var(--lilac); }
-p { margin: 0; }
-a { color: inherit; text-decoration: none; }
-:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 5px; }
+
+h1, h2, h3, h4 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 500;
+  color: var(--lilac);
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 5px;
+}
 
 .btn {
   display: inline-block;
@@ -55,7 +78,11 @@ a { color: inherit; text-decoration: none; }
   box-shadow: var(--glow-violeta), var(--glow);
   transition: background 0.3s, color 0.3s;
 }
-.btn:hover { background: #1a1160; color: #fff; }
+
+.btn:hover {
+  background: #1a1160;
+  color: #fff;
+}
 
 .btn-fantasma {
   background: rgba(255, 255, 255, 0.06);
@@ -63,8 +90,14 @@ a { color: inherit; text-decoration: none; }
   border: 1px solid rgba(255, 255, 255, 0.16);
   backdrop-filter: blur(8px);
 }
-.btn-fantasma:hover { background: rgba(255, 255, 255, 0.12); }
+
+.btn-fantasma:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation: none !important; scroll-behavior: auto !important; }
+  *, *::before, *::after {
+    animation: none !important;
+    scroll-behavior: auto !important;
+  }
 }

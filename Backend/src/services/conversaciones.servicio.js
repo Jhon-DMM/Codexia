@@ -21,14 +21,53 @@ async function crearConversacion(usuarioId) {
 
 async function listarConversaciones(usuarioId) {
   const resultado = await pool.query(
-    `SELECT c.id, c.titulo, c.creada_en, c.actualizada_en,
+    `SELECT c.id, c.titulo, c.fijada, c.creada_en, c.actualizada_en,
             (SELECT COUNT(*)::integer FROM chats m WHERE m.conversacion_id = c.id) AS cantidad_mensajes
      FROM conversaciones c
      WHERE c.usuario_id = $1
-     ORDER BY c.actualizada_en DESC, c.id DESC`,
+     ORDER BY c.fijada DESC, c.actualizada_en DESC, c.id DESC`,
     [usuarioId]
   );
   return resultado.rows;
+}
+
+async function renombrarConversacion(usuarioId, conversacionId, titulo) {
+  const nombre = typeof titulo === 'string' ? titulo.trim() : '';
+  if (!nombre || nombre.length > 120) {
+    const error = new Error('El nombre debe tener entre 1 y 120 caracteres');
+    error.status = 400;
+    throw error;
+  }
+  const resultado = await pool.query(
+    `UPDATE conversaciones SET titulo = $3
+     WHERE id = $1 AND usuario_id = $2
+     RETURNING id, titulo, fijada`,
+    [conversacionId, usuarioId, nombre]
+  );
+  return resultado.rows[0] || null;
+}
+
+async function fijarConversacion(usuarioId, conversacionId, fijada) {
+  if (typeof fijada !== 'boolean') {
+    const error = new Error('El estado de fijado no es válido');
+    error.status = 400;
+    throw error;
+  }
+  const resultado = await pool.query(
+    `UPDATE conversaciones SET fijada = $3
+     WHERE id = $1 AND usuario_id = $2
+     RETURNING id, titulo, fijada`,
+    [conversacionId, usuarioId, fijada]
+  );
+  return resultado.rows[0] || null;
+}
+
+async function eliminarConversacion(usuarioId, conversacionId) {
+  const resultado = await pool.query(
+    `DELETE FROM conversaciones WHERE id = $1 AND usuario_id = $2 RETURNING id`,
+    [conversacionId, usuarioId]
+  );
+  return Boolean(resultado.rowCount);
 }
 
 async function obtenerConversacion(usuarioId, conversacionId) {
@@ -205,4 +244,13 @@ async function procesarMensaje({ usuarioId, conversacionId, clientMessageId, men
   }
 }
 
-module.exports = { crearConversacion, listarConversaciones, obtenerConversacion, procesarMensaje, LIMITE_DIARIO };
+module.exports = {
+  crearConversacion,
+  listarConversaciones,
+  obtenerConversacion,
+  renombrarConversacion,
+  fijarConversacion,
+  eliminarConversacion,
+  procesarMensaje,
+  LIMITE_DIARIO,
+};

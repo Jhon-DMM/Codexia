@@ -1,6 +1,6 @@
 /* Estilos de la página principal */
-
 /* Contenedor principal del fondo */
+
 .background-cosmico {
   position: absolute;
   top: 0;
@@ -9,18 +9,13 @@
   height: 100vh;
   overflow: hidden;
   z-index: -2;
-  
   /* LA MAGIA DE LA FUSIÓN:
      Inicia con tu color de medianoche, y en el último tramo (del 75% al 100%)
      se funde suavemente hacia el color de tu sección de abajo (--void) */
-  background: linear-gradient(to bottom, 
-    var(--midnight) 0%, 
-    var(--midnight) 75%, 
-    var(--void) 100%
-  );
+  background: linear-gradient(to bottom, var(--midnight) 0%, var(--midnight) 75%, var(--void) 100% );
 }
-
 /* 1. El Halo de luz gigante (Usando tu color de acento --accent) */
+
 .halo-aurora {
   position: absolute;
   top: 30%;
@@ -36,43 +31,50 @@
   animation: auroraRespirando 16s infinite alternate ease-in-out;
   will-change: transform, opacity;
 }
-
 /* 2. El Planeta / Eclipse central (Sincronizado con tus colores oscuros) */
+
 .planeta-eclipse {
   position: absolute;
-  top: 50%; 
+  top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   width: 550px;
   height: 550px;
   border-radius: 50%;
-  
   /* El interior del planeta ahora usa --midnight para mimetizarse con el espacio superior */
-  background: var(--midnight); 
-  
+  background: var(--midnight);
   /* Las sombras ahora emiten luz usando tu color --accent */
-  box-shadow: 
-    0 0 60px 15px rgba(147, 130, 255, 0.3),   /* Resplandor del borde brillante */
-    0 0 150px 45px rgba(147, 130, 255, 0.12), /* Aura cósmica expandida */
-    inset 0 0 30px rgba(147, 130, 255, 0.2);  /* Brillo en el borde interno */
+  box-shadow: 0 0 60px 15px rgba(147, 130, 255, 0.3),  /* Resplandor del borde brillante */ 0 0 150px 45px rgba(147, 130, 255, 0.12),  /* Aura cósmica expandida */ inset 0 0 30px rgba(147, 130, 255, 0.2);
+  /* Brillo en el borde interno */
   pointer-events: none;
   animation: planetaRespirando 5s infinite alternate ease-in-out;
   will-change: transform;
 }
-
 /* --- ANIMACIONES AUTÓNOMAS --- */
+
 @keyframes auroraRespirando {
-  0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0.3; }
-  100% { transform: translate(-50%, -50%) scale(1.30); opacity: 1; }
+  0% {
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 0.3;
+  }
+
+  100% {
+    transform: translate(-50%, -50%) scale(1.30);
+    opacity: 1;
+  }
 }
 
 @keyframes planetaRespirando {
-  0% { transform: translate(-50%, -50%) translateY(0px); }
-  100% { transform: translate(-50%, -50%) translateY(-10px); }
+  0% {
+    transform: translate(-50%, -50%) translateY(0px);
+  }
+
+  100% {
+    transform: translate(-50%, -50%) translateY(-10px);
+  }
 }
-
-
 /* 3. Header: eslogan | menú centrado | login */
+
 .encabezado {
   position: sticky;
   top: 0;
@@ -86,9 +88,10 @@
   margin-inline: auto;
   padding: 12px 20px;
 }
-.titulo-2 { 
-  grid-area: eslogan; 
-  font-size: 1.4rem; 
+
+.titulo-2 {
+  grid-area: eslogan;
+  font-size: 1.4rem;
   line-height: 1.11;
   letter-spacing: -0.5px;
   background: linear-gradient(90deg, #e59cff, #9cb2ff, #ba9cff, #e59cff);
@@ -98,23 +101,42 @@
   color: transparent;
   animation: cambiar-color 4s linear infinite;
 }
+
 .menu-pildora {
   grid-area: menu;
   justify-self: center;
   display: flex;
   gap: 20px;
   padding: 8px 20px;
-  background: transparent ;
+  background: transparent;
   -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
   border-radius: 999px;
   box-shadow: var(--glow);
 }
-.menu { font-size: 0.9rem; text-transform: capitalize; transition: color 0.3s; }
-.menu:hover { color: var(--accent); }
-.btn-login { grid-area: login; justify-self: end; background:rgba(31, 1, 65, 0.8); color: #fff; }
-.btn-login:hover { background: #330e5b; }
+
+.menu {
+  font-size: 0.9rem;
+  text-transform: capitalize;
+  transition: color 0.3s;
+}
+
+.menu:hover {
+  color: var(--accent);
+}
+
+.btn-login {
+  grid-area: login;
+  justify-self: end;
+  background:rgba(31, 1, 65, 0.8);
+  color: #fff;
+}
+
+.btn-login:hover {
+  background: #330e5b;
+}
 /* 5. Hero */
+
 .hero {
   position: relative;
   display: flex;
@@ -126,8 +148,20 @@
   overflow: hidden;
 }
 
-.hero-content { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 16px; }
-.logo { width: 100%; max-width: 96px; }
+.hero-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.logo {
+  width: 100%;
+  max-width: 96px;
+}
+
 .hero-titulo {
   font-size: clamp(3rem, 11vw, 4.5rem);
   line-height: 1.11;
@@ -139,8 +173,19 @@
   color: transparent;
   animation: cambiar-color 4s linear infinite;
 }
-.hero-content p { margin-bottom: 12px; font-size: 1.125rem; color: var(--ash); }
-.hero-acciones { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+
+.hero-content p {
+  margin-bottom: 12px;
+  font-size: 1.125rem;
+  color: var(--ash);
+}
+
+.hero-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
 
 .reveal-left {
   opacity: 0;
@@ -160,89 +205,305 @@
   transition: opacity 0.7s ease, transform 0.7s ease;
 }
 
-.reveal-down.show,
-.reveal-left.show,
-.reveal-right.show {
+.reveal-down.show, .reveal-left.show, .reveal-right.show {
   opacity: 1;
   transform: translateX(0);
 }
 
-.seccion { scroll-margin-top: -80px; position: relative; overflow: hidden; padding: clamp(72px, 10vw, 120px) 20px; }
-.seccion::before { content: ""; position: absolute; pointer-events: none; }
-.contenido { position: relative; max-width: var(--ancho-contenido); margin-inline: auto; }
-.seccion-titulo { max-width: 640px; margin-inline: auto; text-align: center; }
-.seccion h3 { font-size: clamp(1.9rem, 6vw, 3rem); line-height: 1.17; letter-spacing: -0.3px; }
-.text { margin-top: 16px; font-size: 1.125rem; line-height: 1.56; color: var(--ash); }
+.seccion {
+  scroll-margin-top: -80px;
+  position: relative;
+  overflow: hidden;
+  padding: clamp(72px, 10vw, 120px) 20px;
+}
 
-.seccion-nosotros::before { /* estrellas que titilan */
+.seccion::before {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+
+.contenido {
+  position: relative;
+  max-width: var(--ancho-contenido);
+  margin-inline: auto;
+}
+
+.seccion-titulo {
+  max-width: 640px;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.seccion h3 {
+  font-size: clamp(1.9rem, 6vw, 3rem);
+  line-height: 1.17;
+  letter-spacing: -0.3px;
+}
+
+.text {
+  margin-top: 16px;
+  font-size: 1.125rem;
+  line-height: 1.56;
+  color: var(--ash);
+}
+
+.seccion-nosotros::before {
+  /* estrellas que titilan */
   inset: 0;
-  background-image:
-    radial-gradient(1.5px 1.5px at 12% 25%, #fff, transparent), radial-gradient(1px 1px at 82% 15%, #fff, transparent),
-    radial-gradient(1.5px 1.5px at 65% 70%, #fff, transparent), radial-gradient(1px 1px at 25% 80%, #fff, transparent),
-    radial-gradient(1px 1px at 92% 55%, #fff, transparent), radial-gradient(1.5px 1.5px at 45% 10%, #fff, transparent);
+  background-image: radial-gradient(1.5px 1.5px at 12% 25%, #fff, transparent), radial-gradient(1px 1px at 82% 15%, #fff, transparent), radial-gradient(1.5px 1.5px at 65% 70%, #fff, transparent), radial-gradient(1px 1px at 25% 80%, #fff, transparent), radial-gradient(1px 1px at 92% 55%, #fff, transparent), radial-gradient(1.5px 1.5px at 45% 10%, #fff, transparent);
   animation: titilar 4s ease-in-out infinite alternate;
 }
-.seccion-servicios::before { /* resplandor que flota */
-  width: 560px; height: 560px; top: 5%; left: -8%;
+
+.seccion-servicios::before {
+  /* resplandor que flota */
+  width: 560px;
+  height: 560px;
+  top: 5%;
+  left: -8%;
   background: radial-gradient(circle, rgba(147, 130, 255, 0.2), transparent 65%);
   animation: flotar 14s ease-in-out infinite alternate;
 }
-.seccion-asistente::before { /* respiración suave */
-  width: 640px; height: 640px; top: 50%; left: 50%;
+
+.seccion-asistente::before {
+  /* respiración suave */
+  width: 640px;
+  height: 640px;
+  top: 50%;
+  left: 50%;
   background: radial-gradient(circle, rgba(80, 70, 228, 0.26), transparent 65%);
   animation: respirar 8s ease-in-out infinite;
 }
-.seccion-porque::before { /* haz de luz que gira lentamente */
-  width: 760px; height: 760px; top: 50%; left: 50%; margin: -380px 0 0 -380px; border-radius: 50%;
+
+.seccion-porque::before {
+  /* haz de luz que gira lentamente */
+  width: 760px;
+  height: 760px;
+  top: 50%;
+  left: 50%;
+  margin: -380px 0 0 -380px;
+  border-radius: 50%;
   background: conic-gradient(from 0deg, transparent 0 55%, rgba(186, 156, 255, 0.18) 80%, transparent);
   -webkit-mask: radial-gradient(circle, #000 0, transparent 70%);
   mask: radial-gradient(circle, #000 0, transparent 70%);
   animation: girar 30s linear infinite;
 }
-
 /* 7. Listas */
-.lista { display: grid; gap: 40px 56px; margin: 56px 0 0; padding: 0; list-style: none; }
-.lista h4 { margin-bottom: 8px; font-size: 1.25rem; line-height: 1.33; }
-.lista p { font-size: 0.95rem; line-height: 1.6; color: var(--fog); }
-.num { display: block; margin-bottom: 8px; font-size: 0.85rem; color: var(--accent); }
-.lista-servicios li { display: grid; grid-template-columns: auto 1fr; gap: 16px; }
-.icono { width: 24px; height: 24px; margin-top: 2px; fill: none; stroke: var(--lilac); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
-.lista-puntos li { position: relative; padding-left: 24px; }
-.lista-puntos li::before { content: ""; position: absolute; left: 0; top: 0.6em; width: 8px; height: 8px; border-radius: 50%; background: var(--cosmic); }
 
-/* 8. Sección del asistente */
-.asistente-grid { display: grid; gap: 48px; align-items: center; }
-.lista-razones { margin: 32px 0; gap: 24px; }
-.asistente-chat { display: flex; flex-direction: column; gap: 16px; }
-.asistente-chat .btn { align-self: center; }
-.chat-ejemplo { display: flex; flex-direction: column; gap: 12px; padding: 24px; background: rgba(6, 3, 23, 0.7); border-radius: 16px; box-shadow: var(--glow); }
-.burbuja { max-width: 85%; padding: 10px 14px; border-radius: 16px; font-size: 0.95rem; line-height: 1.5; }
-.burbuja-usuario { align-self: flex-end; background: var(--indigo); color: var(--lilac); }
-.burbuja-ia { background: rgba(255, 255, 255, 0.05); color: var(--ash); }
-
-/* 9. Footer */
-footer { padding: 64px 20px 48px; }
-.contenedor-footer { display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
-.contenedor-footer h4 { font-size: 1.5rem; }
-.contenedor-footer p { font-size: 0.95rem; color: var(--fog); }
-.footer-links { display: flex; justify-content: center; gap: 16px; margin-top: 32px; }
-.social-icon { display: inline-flex; color: var(--fog); transition: color 0.3s; }
-.social-icon svg { stroke-width: 1.5; }
-.social-icon:hover { color: var(--accent); }
-
-/* 10. Animaciones */
-.reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.8s ease-out, transform 0.8s ease-out; }
-.reveal.show { opacity: 1; transform: none; }
-@keyframes cambiar-color { to { background-position: 300% 0; } }
-@keyframes titilar { from { opacity: 0.25; } to { opacity: 1; } }
-@keyframes flotar { to { transform: translate(40vw, 80px); } }
-@keyframes respirar {
-  0%, 100% { transform: translate(-50%, -50%) scale(0.85); opacity: 0.6; }
-  50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+.lista {
+  display: grid;
+  gap: 40px 56px;
+  margin: 56px 0 0;
+  padding: 0;
+  list-style: none;
 }
-@keyframes girar { to { transform: rotate(360deg); } }
+
+.lista h4 {
+  margin-bottom: 8px;
+  font-size: 1.25rem;
+  line-height: 1.33;
+}
+
+.lista p {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--fog);
+}
+
+.num {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 0.85rem;
+  color: var(--accent);
+}
+
+.lista-servicios li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 16px;
+}
+
+.icono {
+  width: 24px;
+  height: 24px;
+  margin-top: 2px;
+  fill: none;
+  stroke: var(--lilac);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.lista-puntos li {
+  position: relative;
+  padding-left: 24px;
+}
+
+.lista-puntos li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.6em;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--cosmic);
+}
+/* 8. Sección del asistente */
+
+.asistente-grid {
+  display: grid;
+  gap: 48px;
+  align-items: center;
+}
+
+.lista-razones {
+  margin: 32px 0;
+  gap: 24px;
+}
+
+.asistente-chat {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.asistente-chat .btn {
+  align-self: center;
+}
+
+.chat-ejemplo {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 24px;
+  background: rgba(6, 3, 23, 0.7);
+  border-radius: 16px;
+  box-shadow: var(--glow);
+}
+
+.burbuja {
+  max-width: 85%;
+  padding: 10px 14px;
+  border-radius: 16px;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.burbuja-usuario {
+  align-self: flex-end;
+  background: var(--indigo);
+  color: var(--lilac);
+}
+
+.burbuja-ia {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--ash);
+}
+/* 9. Footer */
+
+footer {
+  padding: 64px 20px 48px;
+}
+
+.contenedor-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.contenedor-footer h4 {
+  font-size: 1.5rem;
+}
+
+.contenedor-footer p {
+  font-size: 0.95rem;
+  color: var(--fog);
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 32px;
+}
+
+.social-icon {
+  display: inline-flex;
+  color: var(--fog);
+  transition: color 0.3s;
+}
+
+.social-icon svg {
+  stroke-width: 1.5;
+}
+
+.social-icon:hover {
+  color: var(--accent);
+}
+/* 10. Animaciones */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.reveal.show {
+  opacity: 1;
+  transform: none;
+}
+
+@keyframes cambiar-color {
+  to {
+    background-position: 300% 0;
+  }
+}
+
+@keyframes titilar {
+  from {
+    opacity: 0.25;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes flotar {
+  to {
+    transform: translate(40vw, 80px);
+  }
+}
+
+@keyframes respirar {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(0.85);
+    opacity: 0.6;
+  }
+
+  50% {
+    transform: translate(-50%, -50%) scale(1.1);
+    opacity: 1;
+  }
+}
+
+@keyframes girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
 /* Estrellas fugaces generadas por js/estrellas.js */
-.estrellas { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+
+.estrellas {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
 .estrella {
   position: absolute;
   width: var(--tam);
@@ -253,32 +514,82 @@ footer { padding: 64px 20px 48px; }
   opacity: 0;
   animation: viajar var(--dur) ease-in-out forwards;
 }
+
 @keyframes viajar {
-  0% { opacity: 0; transform: translate(0, 0); }
-  20%, 80% { opacity: 1; }
-  100% { opacity: 0; transform: translate(var(--dx), var(--dy)); }
+  0% {
+    opacity: 0;
+    transform: translate(0, 0);
+  }
+
+  20%, 80% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(var(--dx), var(--dy));
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .reveal { opacity: 1; transform: none; transition: none; }
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
 }
 
 @media (min-width: 768px) {
-  .encabezado { grid-template-columns: 1fr auto 1fr; grid-template-areas: "eslogan menu login"; }
-  .menu-pildora { gap: 28px; padding-inline: 24px; }
-  .lista { grid-template-columns: repeat(2, 1fr); }
-  .lista-razones { grid-template-columns: 1fr; }
-  .asistente-grid { grid-template-columns: 1.1fr 0.9fr; }
-  .footer-links { gap: 24px; }
-  .social-icon {transform: animation 0.5s ease-in-out;}
-  .social-icon:hover {transform: translateY(-6px);}
+  .encabezado {
+    grid-template-columns: 1fr auto 1fr;
+    grid-template-areas: "eslogan menu login";
+  }
+
+  .menu-pildora {
+    gap: 28px;
+    padding-inline: 24px;
+  }
+
+  .lista {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .lista-razones {
+    grid-template-columns: 1fr;
+  }
+
+  .asistente-grid {
+    grid-template-columns: 1.1fr 0.9fr;
+  }
+
+  .footer-links {
+    gap: 24px;
+  }
+
+  .social-icon {
+    transform: animation 0.5s ease-in-out;
+  }
+
+  .social-icon:hover {
+    transform: translateY(-6px);
+  }
 }
+
 @media (min-width: 1920px) {
-  .hero-titulo { font-size: 5rem; }
-  .hero-content p { font-size: 1.5rem; }
-  .logo { max-width: 140px; }
+  .hero-titulo {
+    font-size: 5rem;
+  }
+
+  .hero-content p {
+    font-size: 1.5rem;
+  }
+
+  .logo {
+    max-width: 140px;
+  }
 }
 /* Contenedor principal del fondo */
+
 .background-cosmico {
   position: absolute;
   top: 0;

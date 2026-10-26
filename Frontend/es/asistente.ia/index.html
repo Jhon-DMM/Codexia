@@ -15,29 +15,72 @@
 </head>
 
 <body class="pagina-chat">
-  <main>
+  <main class="asistente-shell">
     <div class="chat-encabezado">
-      <div>
-        <h1>Asistente de IA | Codexia</h1>
+      <div class="chat-nav">
+        <button id="alternar-historial" class="btn btn-fantasma btn-menu" type="button" aria-expanded="false" aria-controls="historial-conversaciones" aria-label="Mostrar conversaciones">
+          <span aria-hidden="true">☰</span><span id="texto-alternar-historial">Mostrar conversaciones</span>
+        </button>
+        <a class="asistente-marca" href="../../index.html" aria-label="Codexia, volver al inicio">
+          <span class="asistente-marca-icono" aria-hidden="true">✦</span>
+          <span>Codexia</span>
+        </a>
+      </div>
+      <div class="chat-cuenta">
         <p>Hola, <span id="nombre-usuario"></span></p>
+        <button id="cerrar-sesion" class="btn btn-fantasma" type="button">Cerrar sesión</button>
       </div>
-      <button id="cerrar-sesion" class="btn btn-fantasma" type="button">Cerrar sesión</button>
     </div>
-    <p id="cuota-diaria" class="cuota-diaria" aria-live="polite"></p>
-    <nav class="historial-conversaciones" aria-label="Mis conversaciones">
-      <div class="historial-encabezado">
-        <h2>Mis conversaciones</h2>
-        <button id="nueva-conversacion" class="btn btn-fantasma" type="button">Nueva conversación</button>
-      </div>
-      <div id="lista-conversaciones" class="lista-conversaciones"></div>
-    </nav>
-    <div class="chat" role="log" aria-live="polite" aria-relevant="additions text"></div>
-    <div class="entrada">
-      <label class="texto-oculto" for="mensaje">Tu mensaje para la asistente</label>
-      <input type="text" id="mensaje" placeholder="Escribe tu mensaje" maxlength="4000" autocomplete="off">
-      <button id="enviar" class="btn" type="button">Enviar</button>
+    <div class="asistente-layout historial-oculto">
+      <nav id="historial-conversaciones" class="historial-conversaciones" aria-label="Mis conversaciones" inert>
+        <button id="nueva-conversacion" class="btn btn-nueva" type="button">＋ <span>Nueva conversación</span></button>
+        <section id="grupo-fijadas" class="grupo-conversaciones grupo-fijadas" aria-label="Conversaciones fijadas" hidden>
+          <div class="historial-encabezado"><h2><span aria-hidden="true">📌</span> Fijadas</h2></div>
+          <div id="lista-fijadas" class="lista-conversaciones lista-fijadas"></div>
+        </section>
+        <section class="grupo-conversaciones grupo-recientes" aria-label="Conversaciones recientes">
+          <div class="historial-encabezado">
+            <h2>Recientes</h2>
+          </div>
+          <div id="lista-conversaciones" class="lista-conversaciones"></div>
+        </section>
+        <div class="cuota-panel">
+          <p class="cuota-titulo">Uso de hoy</p>
+          <p id="cuota-diaria" class="cuota-diaria" aria-live="polite"></p>
+          <div id="cuota-barra" class="cuota-barra" role="progressbar" aria-label="Uso diario del asistente" aria-valuenow="0" aria-valuemin="0" aria-valuemax="30"><span></span></div>
+          <p class="cuota-ayuda">Límite diario de mensajes</p>
+        </div>
+      </nav>
+      <section class="chat-seccion" aria-label="Chat con el asistente">
+        <div class="chat-bienvenida">
+          <p class="chat-etiqueta">ASISTENTE PERSONAL</p>
+          <h1>¿Qué tienes en mente?</h1>
+          <p>Estoy aquí para ayudarte a pensar, crear y resolver.</p>
+        </div>
+        <div class="chat" role="log" aria-label="Mensajes de la conversación" aria-live="polite" aria-relevant="additions text" tabindex="0"></div>
+        <div class="entrada">
+          <label class="texto-oculto" for="mensaje">Tu mensaje para la asistente</label>
+          <input type="text" id="mensaje" placeholder="Escribe tu mensaje…" maxlength="4000" autocomplete="off">
+          <button id="enviar" class="btn" type="button" aria-label="Enviar mensaje" hidden>→</button>
+        </div>
+        <p class="chat-aviso">El asistente puede equivocarse. Verifica la información importante.</p>
+      </section>
     </div>
   </main>
+  <div id="notificacion-conversacion" class="notificacion-conversacion" role="status" aria-live="polite" hidden></div>
+  <dialog id="modal-conversacion" class="modal-conversacion" aria-labelledby="modal-conversacion-titulo">
+    <form id="formulario-modal-conversacion" class="modal-conversacion-contenido" novalidate>
+      <h2 id="modal-conversacion-titulo"></h2>
+      <p id="modal-conversacion-mensaje"></p>
+      <label id="modal-conversacion-etiqueta" for="modal-conversacion-entrada" hidden></label>
+      <input id="modal-conversacion-entrada" class="modal-conversacion-entrada" type="text" maxlength="120" autocomplete="off" hidden>
+      <p id="modal-conversacion-error" class="modal-conversacion-error" role="alert" hidden></p>
+      <div class="modal-conversacion-acciones">
+        <button id="modal-conversacion-cancelar" class="btn btn-fantasma" type="button">Cancelar</button>
+        <button id="modal-conversacion-confirmar" class="btn" type="submit">Aceptar</button>
+      </div>
+    </form>
+  </dialog>
   <script src="../../js/asistente.js"></script>
 </body>
 

@@ -1,5 +1,13 @@
 const conversacionesService = require('../services/conversaciones.servicio');
 
+const UUID_VALIDO = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+const validarIdConversacion = (id, res) => {
+  if (UUID_VALIDO.test(id || '')) return true;
+  res.status(400).json({ mensaje: 'La conversación indicada no es válida' });
+  return false;
+};
+
 const procesarMensaje = async (req, res) => {
   try {
     const { mensaje, conversationId, clientMessageId } = req.body || {};
@@ -39,9 +47,49 @@ const listarConversaciones = async (req, res) => {
 };
 
 const obtenerConversacion = async (req, res) => {
+  if (!validarIdConversacion(req.params.id, res)) return;
   const conversacion = await conversacionesService.obtenerConversacion(req.usuario.id, req.params.id);
   if (!conversacion) return res.status(404).json({ mensaje: 'No encontramos esa conversación' });
   return res.json({ conversacion });
 };
 
-module.exports = { procesarMensaje, crearConversacion, listarConversaciones, obtenerConversacion };
+const renombrarConversacion = async (req, res) => {
+  if (!validarIdConversacion(req.params.id, res)) return;
+  try {
+    const conversacion = await conversacionesService.renombrarConversacion(req.usuario.id, req.params.id, req.body?.titulo);
+    if (!conversacion) return res.status(404).json({ mensaje: 'No encontramos esa conversación' });
+    return res.json({ conversacion });
+  } catch (error) {
+    if (error.status) return res.status(error.status).json({ mensaje: error.message });
+    throw error;
+  }
+};
+
+const fijarConversacion = async (req, res) => {
+  if (!validarIdConversacion(req.params.id, res)) return;
+  try {
+    const conversacion = await conversacionesService.fijarConversacion(req.usuario.id, req.params.id, req.body?.fijada);
+    if (!conversacion) return res.status(404).json({ mensaje: 'No encontramos esa conversación' });
+    return res.json({ conversacion });
+  } catch (error) {
+    if (error.status) return res.status(error.status).json({ mensaje: error.message });
+    throw error;
+  }
+};
+
+const eliminarConversacion = async (req, res) => {
+  if (!validarIdConversacion(req.params.id, res)) return;
+  const eliminada = await conversacionesService.eliminarConversacion(req.usuario.id, req.params.id);
+  if (!eliminada) return res.status(404).json({ mensaje: 'No encontramos esa conversación' });
+  return res.status(204).end();
+};
+
+module.exports = {
+  procesarMensaje,
+  crearConversacion,
+  listarConversaciones,
+  obtenerConversacion,
+  renombrarConversacion,
+  fijarConversacion,
+  eliminarConversacion,
+};

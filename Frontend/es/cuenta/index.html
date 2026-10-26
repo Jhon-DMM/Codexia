@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="codexia-api-base-url" content="">
   <title>Tu cuenta | Codexia</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,9 +13,13 @@
 </head>
 <body class="pagina-cuenta">
   <main class="cuenta-panel">
-    <a class="cuenta-volver" href="../../index.html">← Volver a Codexia</a>
-    <h1>Tu espacio en Codexia</h1>
-    <p class="cuenta-intro">Inicia sesión o crea una cuenta para conversar con nuestra asistente.</p>
+    <a class="cuenta-marca" href="../../index.html" aria-label="Volver al inicio de Codexia">
+      <span class="cuenta-marca-icono" aria-hidden="true">✦</span>
+      <span>Codexia</span>
+    </a>
+    <p class="cuenta-eyebrow">Tu espacio de ideas</p>
+    <h1>Qué bueno verte<br>de nuevo.</h1>
+    <p class="cuenta-intro">Inicia sesión para continuar tus conversaciones.</p>
 
     <div class="cuenta-pestanas" role="tablist" aria-label="Acceso a tu cuenta">
       <button type="button" class="cuenta-pestana activa" id="pestana-login" role="tab" aria-selected="true">Iniciar sesión</button>
@@ -26,7 +31,7 @@
       <input id="login-correo" name="correo" type="email" autocomplete="email" maxlength="255" required>
       <label for="login-password">Contraseña</label>
       <input id="login-password" name="password" type="password" autocomplete="current-password" required>
-      <button class="btn" type="submit">Entrar al asistente</button>
+      <button class="btn" type="submit">Entrar a Codexia <span aria-hidden="true">→</span></button>
     </form>
 
     <form id="form-registro" class="cuenta-form" hidden>
@@ -36,11 +41,12 @@
       <input id="registro-correo" name="correo" type="email" autocomplete="email" maxlength="255" required>
       <label for="registro-password">Contraseña (mínimo 8 caracteres)</label>
       <input id="registro-password" name="password" type="password" autocomplete="new-password" minlength="8" required>
-      <button class="btn" type="submit">Crear cuenta y continuar</button>
+      <button class="btn" type="submit">Crear cuenta y continuar <span aria-hidden="true">→</span></button>
     </form>
 
     <p id="cuenta-mensaje" class="cuenta-mensaje" role="status" aria-live="polite"></p>
-    <p class="cuenta-nota">El asistente permite hasta 30 mensajes por día. Tus conversaciones quedan guardadas en tu cuenta.</p>
+    <p class="cuenta-nota">Tus conversaciones se guardan en tu cuenta. El asistente permite hasta 30 mensajes por día.</p>
+    <p class="cuenta-terminos">Al continuar, aceptas nuestras condiciones de uso y privacidad.</p>
   </main>
   <script src="../../js/cuenta.js"></script>
 </body>
