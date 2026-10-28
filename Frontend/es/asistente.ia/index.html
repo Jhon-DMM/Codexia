@@ -6,10 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="codexia-api-base-url" content="">
   <title>Asistente de IA | Codexia</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@500&family=Inter:wght@400;500&display=swap"
-    rel="stylesheet">
   <link rel="stylesheet" href="../../css/base.css">
   <link rel="stylesheet" href="../../css/asistente.css">
 </head>
@@ -148,7 +144,7 @@
       <h2 id="modal-eliminar-cuenta-titulo">Eliminar cuenta</h2>
       <p>Esta acción no se puede deshacer. Se eliminarán tu perfil y todas tus conversaciones. Escribe tu contraseña para confirmar.</p>
       <label for="confirmar-password-cuenta">Contraseña actual</label>
-      <input id="confirmar-password-cuenta" class="modal-conversacion-entrada" type="password" autocomplete="current-password" required>
+      <input id="confirmar-password-cuenta" class="modal-conversacion-entrada" type="password" autocomplete="current-password" maxlength="1024" required>
       <p id="error-eliminar-cuenta" class="modal-conversacion-error" role="alert" hidden></p>
       <div class="modal-conversacion-acciones">
         <button id="cancelar-eliminar-cuenta" class="btn btn-fantasma" type="button">Cancelar</button>

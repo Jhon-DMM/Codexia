@@ -1,5 +1,17 @@
 const usuariosService = require('../services/usuarios.servicio');
 const { COOKIE_NAME, opcionesCookie, obtenerTokenSesion } = require('../config/sesion.config');
+const { createHash } = require('crypto');
+
+const MAX_PASSWORD_BYTES = 1024;
+
+function describirTiempoBloqueo(segundos) {
+    const minutos = Math.ceil(segundos / 60);
+    if (minutos >= 60) {
+        const horas = Math.ceil(minutos / 60);
+        return `${horas} ${horas === 1 ? 'hora' : 'horas'}`;
+    }
+    return `${minutos} min`;
+}
 
 async function registrarUsuario(req, res) {
 try {
@@ -18,6 +30,12 @@ try {
             mensaje: 'El nombre, el correo y la contraseña son obligatorios',
         });
       }
+
+    if (req.body?.aceptaTerminos !== 'true' || req.body?.aceptaPrivacidad !== 'true') {
+        return res.status(400).json({
+            mensaje: 'Debes aceptar los términos y autorizar el tratamiento de datos para crear la cuenta',
+        });
+    }
 
     const correoNormalizado = correo.trim().toLowerCase();
 
@@ -41,18 +59,18 @@ try {
         });
     }
 
-    if (password.length < 8 || Buffer.byteLength(password, 'utf8') > 72) {
+    if (password.length < 8 || Buffer.byteLength(password, 'utf8') > MAX_PASSWORD_BYTES) {
         return res.status(400).json({
-            mensaje: 'La contraseña debe tener al menos 8 caracteres y no superar los 72 bytes',
+            mensaje: 'La contraseña debe tener al menos 8 caracteres y no superar los 1024 bytes',
         });
     }
 
-    const usuario = await usuariosService.registrarUsuario({
+    const { usuario, sesion } = await usuariosService.registrarUsuario({
         nombre,
         correo: correoNormalizado,
         password,
+        evidenciaLegal: usuariosService.crearEvidenciaLegal(req, 'registro'),
     });
-    const sesion = await usuariosService.crearSesion(usuario.id);
     res.cookie(COOKIE_NAME, sesion.token, opcionesCookie());
 
     return res.status(201).json({
@@ -83,15 +101,52 @@ async function iniciarSesion(req, res) {
     if (typeof correo !== 'string' || typeof password !== 'string' || !correo.trim() || !password) {
         return res.status(400).json({ mensaje: 'El correo y la contraseña son obligatorios' });
     }
-    if (Buffer.byteLength(password, 'utf8') > 72) {
-        return res.status(400).json({ mensaje: 'La contraseña no puede superar los 72 bytes' });
+    if (correo.trim().length > 254) {
+        return res.status(400).json({ mensaje: 'El correo no puede superar los 254 caracteres' });
+    }
+    if (Buffer.byteLength(password, 'utf8') > MAX_PASSWORD_BYTES) {
+        return res.status(400).json({ mensaje: 'La contraseña no puede superar los 1024 bytes' });
+    }
+    if (req.body?.aceptaTerminos !== 'true' || req.body?.aceptaPrivacidad !== 'true') {
+        return res.status(400).json({
+            mensaje: 'Debes aceptar los términos y autorizar el tratamiento de datos para iniciar sesión',
+        });
     }
 
-    const usuario = await usuariosService.iniciarSesion({ correo, password });
+    const correoNormalizado = correo.trim().toLowerCase();
+    const claveIntentos = createHash('sha256')
+        .update(`${correoNormalizado}\0${req.ip || 'ip-desconocida'}`)
+        .digest('hex');
+    const segundosBloqueo = await usuariosService.obtenerBloqueoLogin(claveIntentos);
+    if (segundosBloqueo > 0) {
+        return res.status(429).json({
+            mensaje: `Se agotaron los 3 intentos. Prueba de nuevo en ${describirTiempoBloqueo(segundosBloqueo)}.`,
+            intentosRestantes: 0,
+            reintentarEn: segundosBloqueo,
+        });
+    }
+
+    const usuario = await usuariosService.iniciarSesion({
+        correo: correoNormalizado,
+        password,
+        evidenciaLegal: usuariosService.crearEvidenciaLegal(req, 'inicio_sesion'),
+    });
     if (!usuario) {
-        return res.status(401).json({ mensaje: 'El correo o la contraseña no son correctos' });
+        const intento = await usuariosService.registrarIntentoLoginFallido(claveIntentos);
+        if (intento.segundos > 0) {
+            return res.status(429).json({
+                mensaje: `Se agotaron los 3 intentos. Prueba de nuevo en ${describirTiempoBloqueo(intento.segundos)}.`,
+                intentosRestantes: 0,
+                reintentarEn: intento.segundos,
+            });
+        }
+        return res.status(401).json({
+            mensaje: `El correo o la contraseña no son correctos. Te quedan ${intento.restantes} ${intento.restantes === 1 ? 'intento' : 'intentos'}.`,
+            intentosRestantes: intento.restantes,
+        });
     }
 
+    await usuariosService.limpiarIntentosLogin(claveIntentos);
     const sesion = await usuariosService.crearSesion(usuario.id);
     res.cookie(COOKIE_NAME, sesion.token, opcionesCookie());
     return res.json({ mensaje: 'Sesión iniciada', usuario, expiraEn: sesion.expiraEn });
@@ -130,7 +185,7 @@ async function eliminarMiCuenta(req, res) {
     if (typeof password !== 'string' || !password.trim()) {
         return res.status(400).json({ mensaje: 'Escribe tu contraseña para confirmar la eliminación' });
     }
-    if (Buffer.byteLength(password, 'utf8') > 72) {
+    if (Buffer.byteLength(password, 'utf8') > MAX_PASSWORD_BYTES) {
         return res.status(400).json({ mensaje: 'La contraseña supera el límite permitido' });
     }
 

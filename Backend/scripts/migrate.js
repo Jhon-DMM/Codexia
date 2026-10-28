@@ -8,6 +8,9 @@ async function ejecutarMigracion() {
   const rutasMigraciones = [
     '001_esquema_inicial.sql',
     '002_conversaciones_fijadas.sql',
+    '003_limite_intentos_login.sql',
+    '004_escalada_bloqueo_login.sql',
+    '005_aceptaciones_legales.sql',
   ].map((archivo) => path.join(__dirname, '..', 'database', 'migrations', archivo));
   let client;
 

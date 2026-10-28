@@ -12,7 +12,7 @@ Aplicación web de Codexia con registro e inicio de sesión, conversaciones guar
 
 `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER` y `DB_PASSWORD` configuran PostgreSQL. `GROQ_API_KEY`, `GROQ_BASE_URL` y `GROQ_MODEL` configuran el proveedor del asistente. `ASISTENTE_LIMITE_DIARIO` define la cuota de mensajes por usuario y día; el valor inicial es 30. `FRONTEND_ORIGIN` permite añadir el origen del frontend si se sirve por separado. Cambia el nombre de base de datos del comando de migración para que coincida con `DB_NAME`.
 
-Las sesiones duran siete días. El navegador recibe una cookie `HttpOnly` con `SameSite=Lax`; la API guarda únicamente el hash del token de sesión. En producción, `NODE_ENV=production` activa `Secure`, por lo que la aplicación debe servirse por HTTPS. Si frontend y API se sirven en orígenes distintos, configura `FRONTEND_ORIGIN` con el origen exacto del frontend; el navegador debe enviar credenciales y ambos orígenes deben compartir el mismo sitio para que `SameSite=Lax` permita la cookie.
+Las contraseñas nuevas se protegen con Argon2id. Las cuentas existentes con bcrypt siguen pudiendo iniciar sesión y su hash se actualiza a Argon2id después de verificar correctamente la contraseña. El inicio de sesión permite tres contraseñas incorrectas por ciclo y aumenta la pausa temporal a 15 minutos, 30 minutos, 1 hora y, si continúa, 24 horas. Un inicio correcto reinicia la escalada. Las sesiones duran siete días. El navegador recibe una cookie `HttpOnly` con `SameSite=Lax`; la API guarda únicamente el hash del token de sesión. En producción, `NODE_ENV=production` activa `Secure`, por lo que la aplicación debe servirse por HTTPS. Si frontend y API se sirven en orígenes distintos, configura `FRONTEND_ORIGIN` con el origen exacto del frontend; el navegador debe enviar credenciales y ambos orígenes deben compartir el mismo sitio para que `SameSite=Lax` permita la cookie.
 
 Cada usuario puede tener varias conversaciones; cada burbuja se guarda como una fila vinculada a su conversación. El uso diario se cuenta por fecha de PostgreSQL. Si la API de IA falla, el mensaje fallido no consume cuota.
 
@@ -23,8 +23,11 @@ Cada usuario puede tener varias conversaciones; cada burbuja se guarda como una 
 - `conversaciones`: conversaciones propiedad de un usuario.
 - `chats`: burbujas de usuario y respuestas del asistente dentro de una conversación.
 - `uso_asistente`: consumo diario por usuario.
+- `aceptaciones_legales`: versión, huella SHA-256, fecha, formulario, IP y navegador para acreditar la aceptación. Las constancias se conservan tras eliminar la cuenta y deben protegerse como datos personales.
 
-Las relaciones y restricciones están en `Backend/database/migrations/001_esquema_inicial.sql`. Ejecuta `npm run migrate` desde `Backend` después de configurar PostgreSQL. La migración usa `CREATE TABLE IF NOT EXISTS`: conserva la tabla `usuarios` existente y agrega las tablas que falten. No elimina datos.
+Las relaciones y restricciones están en `Backend/database/migrations/`. Ejecuta `npm run migrate` desde `Backend` después de configurar PostgreSQL. Las migraciones conservan las tablas existentes y agregan las que falten. No eliminan datos.
+
+Los documentos legales están en `Frontend/es/legal/`. Al publicar cambios materiales, actualiza la versión correspondiente en `Backend/src/config/documentos-legales.js` para que las nuevas aceptaciones queden ligadas a esa versión y su huella.
 
 ## Hojas de estilo
 

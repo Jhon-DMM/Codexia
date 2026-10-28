@@ -5,6 +5,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const formRegistro = document.getElementById('form-registro');
   const pestañaLogin = document.getElementById('pestana-login');
   const pestañaRegistro = document.getElementById('pestana-registro');
+  const botonLogin = formLogin.querySelector('button[type="submit"]');
+  const camposLogin = [...formLogin.querySelectorAll('input')];
+  const textoOriginalBotonLogin = botonLogin.innerHTML;
+  let bloqueoLoginHasta = 0;
+  let temporizadorBloqueoLogin = null;
 
   function apiBaseUrl() {
     const configurada = document.querySelector('meta[name="codexia-api-base-url"]')?.content.trim();
@@ -38,6 +43,43 @@ document.addEventListener('DOMContentLoaded', () => {
     mensaje.textContent = '';
   }
 
+  function formatoTiempoRestante(segundos) {
+    const horas = Math.floor(segundos / 3600);
+    const minutos = Math.floor((segundos % 3600) / 60);
+    const segundosRestantes = segundos % 60;
+    const dosDigitos = (numero) => String(numero).padStart(2, '0');
+    return horas > 0
+      ? `${dosDigitos(horas)}:${dosDigitos(minutos)}:${dosDigitos(segundosRestantes)}`
+      : `${dosDigitos(minutos)}:${dosDigitos(segundosRestantes)}`;
+  }
+
+  function actualizarContadorBloqueo() {
+    const segundos = Math.max(0, Math.ceil((bloqueoLoginHasta - Date.now()) / 1000));
+    if (segundos === 0) {
+      clearInterval(temporizadorBloqueoLogin);
+      temporizadorBloqueoLogin = null;
+      bloqueoLoginHasta = 0;
+      camposLogin.forEach((campo) => { campo.disabled = false; });
+      botonLogin.disabled = false;
+      botonLogin.innerHTML = textoOriginalBotonLogin;
+      mensaje.textContent = 'Ya puedes volver a intentarlo.';
+      return;
+    }
+
+    const tiempo = formatoTiempoRestante(segundos);
+    camposLogin.forEach((campo) => { campo.disabled = true; });
+    botonLogin.disabled = true;
+    botonLogin.textContent = `Espera ${tiempo}`;
+    mensaje.textContent = 'Inicio de sesión pausado temporalmente.';
+  }
+
+  function iniciarContadorBloqueo(segundos) {
+    bloqueoLoginHasta = Date.now() + (segundos * 1000);
+    actualizarContadorBloqueo();
+    clearInterval(temporizadorBloqueoLogin);
+    temporizadorBloqueoLogin = setInterval(actualizarContadorBloqueo, 250);
+  }
+
   async function enviar(endpoint, datos, boton) {
     mensaje.textContent = '';
     boton.disabled = true;
@@ -49,7 +91,19 @@ document.addEventListener('DOMContentLoaded', () => {
         body: JSON.stringify(datos),
       });
       const resultado = await respuesta.json();
-      if (!respuesta.ok) throw new Error(resultado.mensaje || 'No fue posible completar la solicitud');
+      if (!respuesta.ok) {
+        if (endpoint === 'login' && respuesta.status === 401) {
+          mensaje.textContent = 'Correo o contraseña equivocado.';
+          return;
+        }
+
+        if (endpoint === 'login' && respuesta.status === 429 && Number.isFinite(resultado.reintentarEn)) {
+          iniciarContadorBloqueo(resultado.reintentarEn);
+          return;
+        }
+
+        throw new Error(resultado.mensaje || 'No fue posible completar la solicitud');
+      }
 
       sessionStorage.removeItem(conversationKey);
       window.location.assign(destinoAsistente());
@@ -58,7 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ? `No se pudo conectar con el servidor (${apiBaseUrl() || window.location.origin}). Comprueba que la API esté iniciada y que el origen de esta página esté permitido por CORS.`
         : error.message || 'No fue posible completar la solicitud. Inténtalo de nuevo.';
     } finally {
-      boton.disabled = false;
+      if (endpoint !== 'login' || Date.now() >= bloqueoLoginHasta) boton.disabled = false;
     }
   }
 

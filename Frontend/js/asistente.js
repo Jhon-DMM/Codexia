@@ -596,7 +596,7 @@ document.addEventListener('DOMContentLoaded', () => {
       confirmarPasswordCuenta.focus();
       return;
     }
-    if (new TextEncoder().encode(password).length > 72) {
+    if (new TextEncoder().encode(password).length > 1024) {
       mostrarErrorEliminarCuenta('La contraseña supera el límite permitido.');
       confirmarPasswordCuenta.focus();
       return;
