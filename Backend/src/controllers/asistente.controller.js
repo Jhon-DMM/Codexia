@@ -84,6 +84,11 @@ const eliminarConversacion = async (req, res) => {
   return res.status(204).end();
 };
 
+const eliminarTodasLasConversaciones = async (req, res) => {
+  const eliminadas = await conversacionesService.eliminarTodasLasConversaciones(req.usuario.id);
+  return res.json({ eliminadas });
+};
+
 module.exports = {
   procesarMensaje,
   crearConversacion,
@@ -92,4 +97,5 @@ module.exports = {
   renombrarConversacion,
   fijarConversacion,
   eliminarConversacion,
+  eliminarTodasLasConversaciones,
 };

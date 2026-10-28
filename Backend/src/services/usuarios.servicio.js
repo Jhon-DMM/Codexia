@@ -53,6 +53,16 @@ async function iniciarSesion({ correo, password }) {
   return { id: usuario.id, nombre: usuario.nombre, correo: usuario.correo };
 }
 
+async function actualizarNombre(usuarioId, nombre) {
+  const resultado = await pool.query(
+    `UPDATE usuarios SET nombre = $2
+     WHERE id = $1
+     RETURNING id, nombre, correo`,
+    [usuarioId, nombre.trim()]
+  );
+  return resultado.rows[0] || null;
+}
+
 async function crearSesion(usuarioId) {
   const token = randomBytes(32).toString('base64url');
   const tokenHash = hashToken(token);
@@ -82,6 +92,21 @@ async function cerrarSesion(token) {
   await pool.query('DELETE FROM sesiones WHERE token_hash = $1', [hashToken(token)]);
 }
 
+async function eliminarCuenta(usuarioId, password) {
+  const resultado = await pool.query(
+    'SELECT password_hash FROM usuarios WHERE id = $1',
+    [usuarioId]
+  );
+  const usuario = resultado.rows[0];
+  if (!usuario || !(await bcrypt.compare(password, usuario.password_hash))) return false;
+
+  const eliminacion = await pool.query(
+    'DELETE FROM usuarios WHERE id = $1 RETURNING id',
+    [usuarioId]
+  );
+  return eliminacion.rowCount > 0;
+}
+
 async function obtenerCuotaDiaria(usuarioId, limite) {
   const resultado = await pool.query(
     `SELECT COALESCE((
@@ -99,11 +124,24 @@ async function obtenerCuotaDiaria(usuarioId, limite) {
   return resultado.rows[0];
 }
 
+async function obtenerTotalMensajes(usuarioId) {
+  const resultado = await pool.query(
+    `SELECT COALESCE(SUM(cantidad), 0)::integer AS total
+     FROM uso_asistente
+     WHERE usuario_id = $1`,
+    [usuarioId]
+  );
+  return resultado.rows[0].total;
+}
+
 module.exports = {
   registrarUsuario,
   iniciarSesion,
+  actualizarNombre,
   crearSesion,
   obtenerUsuarioPorToken,
   cerrarSesion,
+  eliminarCuenta,
   obtenerCuotaDiaria,
+  obtenerTotalMensajes,
 };

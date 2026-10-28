@@ -19,7 +19,7 @@
     <div class="chat-encabezado">
       <div class="chat-nav">
         <button id="alternar-historial" class="btn btn-fantasma btn-menu" type="button" aria-expanded="false" aria-controls="historial-conversaciones" aria-label="Mostrar conversaciones">
-          <span aria-hidden="true">☰</span><span id="texto-alternar-historial">Mostrar conversaciones</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"></path></svg>
         </button>
         <a class="asistente-marca" href="../../index.html" aria-label="Codexia, volver al inicio">
           <span class="asistente-marca-icono" aria-hidden="true">✦</span>
@@ -32,26 +32,43 @@
       </div>
     </div>
     <div class="asistente-layout historial-oculto">
-      <nav id="historial-conversaciones" class="historial-conversaciones" aria-label="Mis conversaciones" inert>
-        <button id="nueva-conversacion" class="btn btn-nueva" type="button">＋ <span>Nueva conversación</span></button>
-        <section id="grupo-fijadas" class="grupo-conversaciones grupo-fijadas" aria-label="Conversaciones fijadas" hidden>
-          <div class="historial-encabezado"><h2><span aria-hidden="true">📌</span> Fijadas</h2></div>
-          <div id="lista-fijadas" class="lista-conversaciones lista-fijadas"></div>
-        </section>
-        <section class="grupo-conversaciones grupo-recientes" aria-label="Conversaciones recientes">
-          <div class="historial-encabezado">
-            <h2>Recientes</h2>
-          </div>
-          <div id="lista-conversaciones" class="lista-conversaciones"></div>
-        </section>
-        <div class="cuota-panel">
-          <p class="cuota-titulo">Uso de hoy</p>
-          <p id="cuota-diaria" class="cuota-diaria" aria-live="polite"></p>
-          <div id="cuota-barra" class="cuota-barra" role="progressbar" aria-label="Uso diario del asistente" aria-valuenow="0" aria-valuemin="0" aria-valuemax="30"><span></span></div>
-          <p class="cuota-ayuda">Límite diario de mensajes</p>
-        </div>
+      <nav class="barra-lateral" aria-label="Secciones principales">
+        <button id="ver-conversaciones" class="navegacion-lateral-boton activo" type="button" aria-label="Conversaciones" aria-current="page" title="Conversaciones">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7"></path><path d="M5 9v11h14V9"></path><path d="M9 20v-6h6v6"></path></svg>
+        </button>
+        <button id="ver-cuenta" class="navegacion-lateral-boton" type="button" aria-label="Cuenta" title="Cuenta">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"></path><path d="m19.4 15 .1.1 1.4 1.1-1.4 2.4-1.7-.7a8 8 0 0 1-1.8 1l-.3 1.8h-2.8l-.3-1.8a8 8 0 0 1-1.8-1l-1.7.7-1.4-2.4 1.4-1.1a7 7 0 0 1 0-2l-1.4-1.1 1.4-2.4 1.7.7a8 8 0 0 1 1.8-1l.3-1.8h2.8l.3 1.8a8 8 0 0 1 1.8 1l1.7-.7 1.4 2.4-1.4 1.1a7 7 0 0 1 0 2Z"></path></svg>
+        </button>
       </nav>
-      <section class="chat-seccion" aria-label="Chat con el asistente">
+      <div class="asistente-tarjeta">
+        <button id="cerrar-historial-fondo" class="cerrar-historial-fondo" type="button" aria-label="Cerrar conversaciones" hidden></button>
+        <nav id="historial-conversaciones" class="historial-conversaciones" aria-label="Mis conversaciones" inert>
+        <div id="vista-conversaciones">
+          <button id="nueva-conversacion" class="btn btn-nueva" type="button">＋ <span>Nueva conversación</span></button>
+          <section id="grupo-fijadas" class="grupo-conversaciones grupo-fijadas" aria-label="Conversaciones fijadas" hidden>
+            <div class="historial-encabezado"><h2><span aria-hidden="true">📌</span> Fijadas</h2></div>
+            <div id="lista-fijadas" class="lista-conversaciones lista-fijadas"></div>
+          </section>
+          <section class="grupo-conversaciones grupo-recientes" aria-label="Conversaciones recientes">
+            <div class="historial-encabezado"><h2>Recientes</h2></div>
+            <div id="lista-conversaciones" class="lista-conversaciones"></div>
+          </section>
+          <div class="cuota-panel">
+            <p class="cuota-titulo">Uso de hoy</p>
+            <p id="cuota-diaria" class="cuota-diaria" aria-live="polite"></p>
+            <div id="cuota-barra" class="cuota-barra" role="progressbar" aria-label="Uso diario del asistente" aria-valuenow="0" aria-valuemin="0" aria-valuemax="30"><span></span></div>
+            <p class="cuota-ayuda">Límite diario de mensajes</p>
+          </div>
+        </div>
+        </nav>
+        <aside class="panel-chat-vacio" aria-label="Información del chat" hidden>
+          <h2 id="titulo-chat-lateral">Nueva conversación</h2>
+          <div class="panel-chat-cuota">
+            <strong id="cuota-chat-lateral">0 / 30</strong>
+            <span>Mensajes de hoy</span>
+          </div>
+        </aside>
+        <section class="chat-seccion" aria-label="Chat con el asistente">
         <div class="chat-bienvenida">
           <p class="chat-etiqueta">ASISTENTE PERSONAL</p>
           <h1>¿Qué tienes en mente?</h1>
@@ -64,7 +81,52 @@
           <button id="enviar" class="btn" type="button" aria-label="Enviar mensaje" hidden>→</button>
         </div>
         <p class="chat-aviso">El asistente puede equivocarse. Verifica la información importante.</p>
-      </section>
+        </section>
+        <section id="pagina-cuenta" class="pagina-cuenta" aria-label="Información de la cuenta" hidden>
+        <div class="pagina-cuenta-contenido">
+          <div class="acciones-pagina-cuenta">
+            <button id="menu-editar-cuenta" class="icono-editar-cuenta" type="button" aria-label="Editar cuenta" aria-expanded="false" aria-controls="opciones-editar-cuenta" title="Editar cuenta">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 5 5 5M4 20l4.2-.9L19 8.3a2.1 2.1 0 0 0-3-3L5.2 16.1 4 20Z"></path></svg>
+            </button>
+            <div id="opciones-editar-cuenta" class="opciones-editar-cuenta" hidden>
+              <button id="cambiar-nombre-cuenta" class="btn btn-fantasma" type="button">Cambiar nombre</button>
+            </div>
+          </div>
+          <p class="chat-etiqueta">PERFIL</p>
+          <header class="perfil-cuenta">
+            <div id="avatar-cuenta" class="avatar-cuenta" aria-hidden="true">C</div>
+            <div>
+              <h1 id="cuenta-nombre"></h1>
+              <p id="cuenta-correo"></p>
+            </div>
+          </header>
+          <section class="resumen-cuenta" aria-labelledby="resumen-cuenta-titulo">
+            <h2 id="resumen-cuenta-titulo">Uso del asistente</h2>
+            <div class="estadisticas-cuenta">
+              <div><strong id="cuenta-total-mensajes">—</strong><span>Mensajes enviados desde que creaste tu cuenta</span></div>
+              <div><strong id="cuenta-limite">30</strong><span>Límite diario</span></div>
+              <div><strong id="cuenta-restante">30</strong><span>Mensajes disponibles</span></div>
+            </div>
+            <p id="estado-total-mensajes" class="estado-total-mensajes" role="status" hidden></p>
+          </section>
+          <section class="seguridad-cuenta" aria-labelledby="seguridad-cuenta-titulo">
+            <div>
+              <h2 id="seguridad-cuenta-titulo">Seguridad de la cuenta</h2>
+              <p>Si ya no quieres usar Codexia, puedes eliminar tu perfil y sus datos guardados.</p>
+            </div>
+            <div class="cuenta-zona-peligro">
+              <h3>Conversaciones</h3>
+              <p>Elimina todas las conversaciones y sus mensajes guardados.</p>
+              <button id="borrar-todas-conversaciones" class="btn btn-eliminar-cuenta" type="button">Borrar todas las conversaciones</button>
+              <div class="separador-zona-peligro" aria-hidden="true"></div>
+              <h3>Eliminar cuenta</h3>
+              <p>Se borrarán tu cuenta y todas tus conversaciones de forma permanente.</p>
+              <button id="abrir-eliminar-cuenta" class="btn btn-eliminar-cuenta" type="button">Eliminar mi cuenta</button>
+            </div>
+          </section>
+        </div>
+        </section>
+      </div>
     </div>
   </main>
   <div id="notificacion-conversacion" class="notificacion-conversacion" role="status" aria-live="polite" hidden></div>
@@ -78,6 +140,19 @@
       <div class="modal-conversacion-acciones">
         <button id="modal-conversacion-cancelar" class="btn btn-fantasma" type="button">Cancelar</button>
         <button id="modal-conversacion-confirmar" class="btn" type="submit">Aceptar</button>
+      </div>
+    </form>
+  </dialog>
+  <dialog id="modal-eliminar-cuenta" class="modal-conversacion" aria-labelledby="modal-eliminar-cuenta-titulo">
+    <form id="formulario-eliminar-cuenta" class="modal-conversacion-contenido" novalidate>
+      <h2 id="modal-eliminar-cuenta-titulo">Eliminar cuenta</h2>
+      <p>Esta acción no se puede deshacer. Se eliminarán tu perfil y todas tus conversaciones. Escribe tu contraseña para confirmar.</p>
+      <label for="confirmar-password-cuenta">Contraseña actual</label>
+      <input id="confirmar-password-cuenta" class="modal-conversacion-entrada" type="password" autocomplete="current-password" required>
+      <p id="error-eliminar-cuenta" class="modal-conversacion-error" role="alert" hidden></p>
+      <div class="modal-conversacion-acciones">
+        <button id="cancelar-eliminar-cuenta" class="btn btn-fantasma" type="button">Cancelar</button>
+        <button id="confirmar-eliminar-cuenta" class="btn modal-boton-peligro" type="submit">Eliminar cuenta</button>
       </div>
     </form>
   </dialog>

@@ -70,6 +70,14 @@ async function eliminarConversacion(usuarioId, conversacionId) {
   return Boolean(resultado.rowCount);
 }
 
+async function eliminarTodasLasConversaciones(usuarioId) {
+  const resultado = await pool.query(
+    'DELETE FROM conversaciones WHERE usuario_id = $1',
+    [usuarioId]
+  );
+  return resultado.rowCount;
+}
+
 async function obtenerConversacion(usuarioId, conversacionId) {
   const cliente = await pool.connect();
   try {
@@ -251,6 +259,7 @@ module.exports = {
   renombrarConversacion,
   fijarConversacion,
   eliminarConversacion,
+  eliminarTodasLasConversaciones,
   procesarMensaje,
   LIMITE_DIARIO,
 };

@@ -109,6 +109,44 @@ async function obtenerMiCuenta(req, res) {
     return res.json({ usuario: req.usuario });
 }
 
+async function actualizarMiNombre(req, res) {
+    const nombre = typeof req.body?.nombre === 'string' ? req.body.nombre.trim() : '';
+    if (!nombre || nombre.length > 100) {
+        return res.status(400).json({ mensaje: 'El nombre debe tener entre 1 y 100 caracteres' });
+    }
+
+    try {
+        const usuario = await usuariosService.actualizarNombre(req.usuario.id, nombre);
+        if (!usuario) return res.status(404).json({ mensaje: 'No encontramos tu cuenta' });
+        return res.json({ usuario });
+    } catch (error) {
+        console.error('Error al actualizar el nombre:', error.message);
+        return res.status(500).json({ mensaje: 'No se pudo actualizar el nombre. Inténtalo de nuevo.' });
+    }
+}
+
+async function eliminarMiCuenta(req, res) {
+    const { password } = req.body || {};
+    if (typeof password !== 'string' || !password.trim()) {
+        return res.status(400).json({ mensaje: 'Escribe tu contraseña para confirmar la eliminación' });
+    }
+    if (Buffer.byteLength(password, 'utf8') > 72) {
+        return res.status(400).json({ mensaje: 'La contraseña supera el límite permitido' });
+    }
+
+    try {
+        const eliminada = await usuariosService.eliminarCuenta(req.usuario.id, password);
+        if (!eliminada) return res.status(403).json({ mensaje: 'La contraseña no es correcta' });
+
+        const { maxAge, ...opcionesBorrado } = opcionesCookie();
+        res.clearCookie(COOKIE_NAME, opcionesBorrado);
+        return res.json({ mensaje: 'La cuenta se eliminó correctamente' });
+    } catch (error) {
+        console.error('Error al eliminar la cuenta:', error.message);
+        return res.status(500).json({ mensaje: 'No se pudo eliminar la cuenta. Inténtalo de nuevo.' });
+    }
+}
+
 async function obtenerMiCuota(req, res) {
     const configurado = Number(process.env.ASISTENTE_LIMITE_DIARIO);
     const limite = Number.isInteger(configurado) && configurado > 0 ? configurado : 30;
@@ -116,10 +154,18 @@ async function obtenerMiCuota(req, res) {
     return res.json(cuota);
 }
 
+async function obtenerEstadisticasMiCuenta(req, res) {
+    const totalMensajes = await usuariosService.obtenerTotalMensajes(req.usuario.id);
+    return res.json({ totalMensajes });
+}
+
 module.exports = {
   registrarUsuario,
   iniciarSesion,
   cerrarSesion,
   obtenerMiCuenta,
+  actualizarMiNombre,
+  eliminarMiCuenta,
   obtenerMiCuota,
+  obtenerEstadisticasMiCuenta,
 };

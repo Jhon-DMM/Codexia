@@ -7,6 +7,7 @@ const router = express.Router();
 router.use(requerirAutenticacion);
 router.post('/conversaciones', asistenteController.crearConversacion);
 router.get('/conversaciones', asistenteController.listarConversaciones);
+router.delete('/conversaciones', asistenteController.eliminarTodasLasConversaciones);
 router.patch('/conversaciones/:id', asistenteController.renombrarConversacion);
 router.patch('/conversaciones/:id/fijar', asistenteController.fijarConversacion);
 router.delete('/conversaciones/:id', asistenteController.eliminarConversacion);
