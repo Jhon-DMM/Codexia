@@ -11,6 +11,12 @@ async function ejecutarMigracion() {
     '003_limite_intentos_login.sql',
     '004_escalada_bloqueo_login.sql',
     '005_aceptaciones_legales.sql',
+    '006_inicio_piloto_usuarios.sql',
+    '007_consola_admin.sql',
+    '008_eliminaciones_admin.sql',
+    '009_limite_ip_login.sql',
+    '010_limite_ip_registro.sql',
+    '011_verificacion_correo.sql',
   ].map((archivo) => path.join(__dirname, '..', 'database', 'migrations', archivo));
   let client;
 
@@ -21,10 +27,16 @@ async function ejecutarMigracion() {
       await client.query(fs.readFileSync(rutaMigracion, 'utf8'));
     }
     await client.query('COMMIT');
-    console.log('Esquema y actualizaciones aplicados correctamente. Los datos existentes se conservaron.');
+    console.log(
+      'Esquema y actualizaciones aplicados correctamente. Los datos existentes se conservaron.',
+    );
   } catch (error) {
     if (client) {
-      try { await client.query('ROLLBACK'); } catch (errorRollback) { /* La conexión puede haberse cerrado. */ }
+      try {
+        await client.query('ROLLBACK');
+      } catch (errorRollback) {
+        /* La conexión puede haberse cerrado. */
+      }
     }
     const detalle = [error.code, error.message, error.cause?.message].filter(Boolean).join(' · ');
     console.error(`No se pudo aplicar el esquema: ${detalle || String(error)}`);

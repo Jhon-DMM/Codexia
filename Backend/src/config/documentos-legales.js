@@ -5,8 +5,8 @@ const { createHash } = require('crypto');
 const RUTA_DOCUMENTOS = path.resolve(__dirname, '../../../Frontend/es/legal');
 
 const DOCUMENTOS_LEGALES = [
-  { tipo: 'terminos', version: '1.0', archivo: 'terminos.html' },
-  { tipo: 'privacidad', version: '1.0', archivo: 'privacidad.html' },
+  { tipo: 'terminos', version: '1.2', archivo: 'terminos.html' },
+  { tipo: 'privacidad', version: '1.5', archivo: 'privacidad.html' },
 ];
 
 function obtenerDocumentosLegales() {

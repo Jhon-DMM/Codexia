@@ -5,16 +5,41 @@ const asistenteService = require('./asistente.servicio');
 const MAX_CARACTERES_MENSAJE = 4000;
 const MAX_MENSAJES_CONTEXTO = 20;
 const LIMITE_CONFIGURADO = Number(process.env.ASISTENTE_LIMITE_DIARIO);
-const LIMITE_DIARIO = Number.isInteger(LIMITE_CONFIGURADO) && LIMITE_CONFIGURADO > 0
-  ? LIMITE_CONFIGURADO
-  : 30;
+const LIMITE_DIARIO =
+  Number.isInteger(LIMITE_CONFIGURADO) && LIMITE_CONFIGURADO > 0 ? LIMITE_CONFIGURADO : 30;
+
+function crearTituloAlternativo(consulta) {
+  const palabras = String(consulta || '')
+    .normalize('NFC')
+    .replace(
+      /^(?:hola[,:]?\s+)?(?:por favor\s+)?(?:me gustaría que|me gustaria que|quisiera que|quiero que|puedes|podrías|podrias|ayúdame a|ayudame a|necesito que|necesito|deseo que|haz que)\s+/i,
+      '',
+    )
+    .split(/\s+/)
+    .map((palabra) => palabra.replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, ''))
+    .filter(Boolean);
+  const titulo = palabras
+    .slice(0, 6)
+    .join(' ')
+    .replace(/[\u0000-\u001f\u007f]/g, '')
+    .trim();
+  if (!titulo) return 'Nueva conversación';
+  const breve =
+    titulo.length <= 60
+      ? titulo
+      : titulo
+          .slice(0, 60)
+          .replace(/\s+\S*$/, '')
+          .trim();
+  return breve.charAt(0).toLocaleUpperCase('es') + breve.slice(1);
+}
 
 async function crearConversacion(usuarioId) {
   const resultado = await pool.query(
     `INSERT INTO conversaciones (id, usuario_id)
      VALUES ($1, $2)
      RETURNING id, creada_en`,
-    [randomUUID(), usuarioId]
+    [randomUUID(), usuarioId],
   );
   return resultado.rows[0];
 }
@@ -26,7 +51,7 @@ async function listarConversaciones(usuarioId) {
      FROM conversaciones c
      WHERE c.usuario_id = $1
      ORDER BY c.fijada DESC, c.actualizada_en DESC, c.id DESC`,
-    [usuarioId]
+    [usuarioId],
   );
   return resultado.rows;
 }
@@ -42,7 +67,7 @@ async function renombrarConversacion(usuarioId, conversacionId, titulo) {
     `UPDATE conversaciones SET titulo = $3
      WHERE id = $1 AND usuario_id = $2
      RETURNING id, titulo, fijada`,
-    [conversacionId, usuarioId, nombre]
+    [conversacionId, usuarioId, nombre],
   );
   return resultado.rows[0] || null;
 }
@@ -57,7 +82,7 @@ async function fijarConversacion(usuarioId, conversacionId, fijada) {
     `UPDATE conversaciones SET fijada = $3
      WHERE id = $1 AND usuario_id = $2
      RETURNING id, titulo, fijada`,
-    [conversacionId, usuarioId, fijada]
+    [conversacionId, usuarioId, fijada],
   );
   return resultado.rows[0] || null;
 }
@@ -65,16 +90,15 @@ async function fijarConversacion(usuarioId, conversacionId, fijada) {
 async function eliminarConversacion(usuarioId, conversacionId) {
   const resultado = await pool.query(
     `DELETE FROM conversaciones WHERE id = $1 AND usuario_id = $2 RETURNING id`,
-    [conversacionId, usuarioId]
+    [conversacionId, usuarioId],
   );
   return Boolean(resultado.rowCount);
 }
 
 async function eliminarTodasLasConversaciones(usuarioId) {
-  const resultado = await pool.query(
-    'DELETE FROM conversaciones WHERE usuario_id = $1',
-    [usuarioId]
-  );
+  const resultado = await pool.query('DELETE FROM conversaciones WHERE usuario_id = $1', [
+    usuarioId,
+  ]);
   return resultado.rowCount;
 }
 
@@ -84,14 +108,14 @@ async function obtenerConversacion(usuarioId, conversacionId) {
     const resultado = await cliente.query(
       `SELECT id, creada_en FROM conversaciones
        WHERE id = $1 AND usuario_id = $2`,
-      [conversacionId, usuarioId]
+      [conversacionId, usuarioId],
     );
     if (!resultado.rowCount) return null;
 
     const mensajes = await cliente.query(
       `SELECT id, rol, contenido, client_message_id, creado_en
        FROM chats WHERE conversacion_id = $1 ORDER BY id`,
-      [conversacionId]
+      [conversacionId],
     );
     return { ...resultado.rows[0], mensajes: mensajes.rows };
   } finally {
@@ -103,7 +127,7 @@ async function obtenerCuotaTransaccion(cliente, usuarioId) {
   const resultado = await cliente.query(
     `SELECT cantidad FROM uso_asistente
      WHERE usuario_id = $1 AND fecha = CURRENT_DATE`,
-    [usuarioId]
+    [usuarioId],
   );
   const usado = resultado.rows[0]?.cantidad || 0;
   return { usado, limite: LIMITE_DIARIO, restante: Math.max(0, LIMITE_DIARIO - usado) };
@@ -120,12 +144,20 @@ async function procesarMensaje({ usuarioId, conversacionId, clientMessageId, men
     error.status = 400;
     throw error;
   }
-  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(conversacionId || '')) {
+  if (
+    !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+      conversacionId || '',
+    )
+  ) {
     const error = new Error('La conversación indicada no es válida');
     error.status = 400;
     throw error;
   }
-  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(clientMessageId || '')) {
+  if (
+    !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+      clientMessageId || '',
+    )
+  ) {
     const error = new Error('El identificador del mensaje no es válido');
     error.status = 400;
     throw error;
@@ -136,30 +168,32 @@ async function procesarMensaje({ usuarioId, conversacionId, clientMessageId, men
   let fechaCuotaReservada = null;
   let historial = [];
   let cuota = null;
+  let generarTitulo = false;
 
   try {
     await cliente.query('BEGIN');
     const conversacion = await cliente.query(
-      `SELECT id FROM conversaciones
+      `SELECT id, titulo FROM conversaciones
        WHERE id = $1 AND usuario_id = $2 FOR UPDATE`,
-      [conversacionId, usuarioId]
+      [conversacionId, usuarioId],
     );
     if (!conversacion.rowCount) {
       const error = new Error('No encontramos esa conversación');
       error.status = 404;
       throw error;
     }
+    const tituloPendiente = conversacion.rows[0].titulo === 'Nueva conversación';
 
     const mensajePrevio = await cliente.query(
       `SELECT id FROM chats
        WHERE conversacion_id = $1 AND client_message_id = $2 AND rol = 'usuario'`,
-      [conversacionId, clientMessageId]
+      [conversacionId, clientMessageId],
     );
     if (mensajePrevio.rowCount) {
       const respuestaPrevia = await cliente.query(
         `SELECT contenido FROM chats
          WHERE conversacion_id = $1 AND client_message_id = $2 AND rol = 'asistente'`,
-        [conversacionId, clientMessageId]
+        [conversacionId, clientMessageId],
       );
       cuota = await obtenerCuotaTransaccion(cliente, usuarioId);
       await cliente.query('COMMIT');
@@ -171,12 +205,13 @@ async function procesarMensaje({ usuarioId, conversacionId, clientMessageId, men
     const mensajesPrevios = await cliente.query(
       `SELECT rol, contenido FROM chats
        WHERE conversacion_id = $1 ORDER BY id DESC LIMIT $2`,
-      [conversacionId, MAX_MENSAJES_CONTEXTO]
+      [conversacionId, MAX_MENSAJES_CONTEXTO],
     );
     historial = mensajesPrevios.rows.reverse().map(({ rol, contenido }) => ({
       role: rol === 'usuario' ? 'user' : 'assistant',
       content: contenido,
     }));
+    generarTitulo = tituloPendiente && historial.length === 0;
 
     const reserva = await cliente.query(
       `INSERT INTO uso_asistente (usuario_id, fecha, cantidad)
@@ -185,7 +220,7 @@ async function procesarMensaje({ usuarioId, conversacionId, clientMessageId, men
        SET cantidad = uso_asistente.cantidad + 1
        WHERE uso_asistente.cantidad < $2
        RETURNING cantidad, fecha`,
-      [usuarioId, LIMITE_DIARIO]
+      [usuarioId, LIMITE_DIARIO],
     );
     if (!reserva.rowCount) {
       cuota = await obtenerCuotaTransaccion(cliente, usuarioId);
@@ -195,19 +230,19 @@ async function procesarMensaje({ usuarioId, conversacionId, clientMessageId, men
 
     cuotaReservada = true;
     fechaCuotaReservada = reserva.rows[0].fecha;
-    cuota = { usado: reserva.rows[0].cantidad, limite: LIMITE_DIARIO, restante: LIMITE_DIARIO - reserva.rows[0].cantidad };
+    cuota = {
+      usado: reserva.rows[0].cantidad,
+      limite: LIMITE_DIARIO,
+      restante: LIMITE_DIARIO - reserva.rows[0].cantidad,
+    };
     await cliente.query(
       `INSERT INTO chats (conversacion_id, rol, contenido, client_message_id)
        VALUES ($1, 'usuario', $2, $3)`,
-      [conversacionId, mensaje.trim(), clientMessageId]
+      [conversacionId, mensaje.trim(), clientMessageId],
     );
-    await cliente.query(
-      `UPDATE conversaciones
-       SET titulo = CASE WHEN titulo = 'Nueva conversación' THEN LEFT($2, 120) ELSE titulo END,
-           actualizada_en = NOW()
-       WHERE id = $1`,
-      [conversacionId, mensaje.trim()]
-    );
+    await cliente.query('UPDATE conversaciones SET actualizada_en = NOW() WHERE id = $1', [
+      conversacionId,
+    ]);
     await cliente.query('COMMIT');
   } catch (error) {
     await cliente.query('ROLLBACK').catch(() => {});
@@ -221,9 +256,24 @@ async function procesarMensaje({ usuarioId, conversacionId, clientMessageId, men
     await pool.query(
       `INSERT INTO chats (conversacion_id, rol, contenido, client_message_id)
        VALUES ($1, 'asistente', $2, $3)`,
-      [conversacionId, respuesta, clientMessageId]
+      [conversacionId, respuesta, clientMessageId],
     );
-    await pool.query('UPDATE conversaciones SET actualizada_en = NOW() WHERE id = $1', [conversacionId]);
+    let titulo = null;
+    if (generarTitulo) {
+      try {
+        titulo = await asistenteService.generarTituloConversacion(mensaje.trim());
+      } catch (errorTitulo) {
+        console.warn('No se pudo generar el título de la conversación:', errorTitulo.message);
+        titulo = crearTituloAlternativo(mensaje.trim());
+      }
+    }
+    await pool.query(
+      `UPDATE conversaciones
+       SET titulo = CASE WHEN $2::text IS NOT NULL AND titulo = 'Nueva conversación' THEN $2 ELSE titulo END,
+           actualizada_en = NOW()
+       WHERE id = $1`,
+      [conversacionId, titulo],
+    );
     return { mensaje: respuesta, cuota };
   } catch (error) {
     if (cuotaReservada) {
@@ -233,12 +283,12 @@ async function procesarMensaje({ usuarioId, conversacionId, clientMessageId, men
         await clienteReembolso.query(
           `DELETE FROM chats
            WHERE conversacion_id = $1 AND client_message_id = $2 AND rol = 'usuario'`,
-          [conversacionId, clientMessageId]
+          [conversacionId, clientMessageId],
         );
         await clienteReembolso.query(
           `UPDATE uso_asistente SET cantidad = GREATEST(0, cantidad - 1)
            WHERE usuario_id = $1 AND fecha = $2`,
-          [usuarioId, fechaCuotaReservada]
+          [usuarioId, fechaCuotaReservada],
         );
         await clienteReembolso.query('COMMIT');
       } catch (errorReembolso) {

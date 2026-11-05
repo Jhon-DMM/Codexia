@@ -7,7 +7,10 @@
     "start": "node servidor.js",
     "dev": "node --watch servidor.js",
     "migrate": "node scripts/migrate.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "admin:promover": "node scripts/promover-admin.js",
+    "test": "node scripts/preparar-db-pruebas.js && node --test",
+    "test:watch": "node --test --watch",
+    "test:database": "node scripts/preparar-db-pruebas.js && node --test tests/database.integration.test.cjs"
   },
   "repository": {
     "type": "git",

@@ -38,7 +38,9 @@ const procesarMensaje = async (req, res) => {
 
 const crearConversacion = async (req, res) => {
   const conversacion = await conversacionesService.crearConversacion(req.usuario.id);
-  return res.status(201).json({ conversationId: conversacion.id, creadaEn: conversacion.creada_en });
+  return res
+    .status(201)
+    .json({ conversationId: conversacion.id, creadaEn: conversacion.creada_en });
 };
 
 const listarConversaciones = async (req, res) => {
@@ -48,7 +50,10 @@ const listarConversaciones = async (req, res) => {
 
 const obtenerConversacion = async (req, res) => {
   if (!validarIdConversacion(req.params.id, res)) return;
-  const conversacion = await conversacionesService.obtenerConversacion(req.usuario.id, req.params.id);
+  const conversacion = await conversacionesService.obtenerConversacion(
+    req.usuario.id,
+    req.params.id,
+  );
   if (!conversacion) return res.status(404).json({ mensaje: 'No encontramos esa conversación' });
   return res.json({ conversacion });
 };
@@ -56,7 +61,11 @@ const obtenerConversacion = async (req, res) => {
 const renombrarConversacion = async (req, res) => {
   if (!validarIdConversacion(req.params.id, res)) return;
   try {
-    const conversacion = await conversacionesService.renombrarConversacion(req.usuario.id, req.params.id, req.body?.titulo);
+    const conversacion = await conversacionesService.renombrarConversacion(
+      req.usuario.id,
+      req.params.id,
+      req.body?.titulo,
+    );
     if (!conversacion) return res.status(404).json({ mensaje: 'No encontramos esa conversación' });
     return res.json({ conversacion });
   } catch (error) {
@@ -68,7 +77,11 @@ const renombrarConversacion = async (req, res) => {
 const fijarConversacion = async (req, res) => {
   if (!validarIdConversacion(req.params.id, res)) return;
   try {
-    const conversacion = await conversacionesService.fijarConversacion(req.usuario.id, req.params.id, req.body?.fijada);
+    const conversacion = await conversacionesService.fijarConversacion(
+      req.usuario.id,
+      req.params.id,
+      req.body?.fijada,
+    );
     if (!conversacion) return res.status(404).json({ mensaje: 'No encontramos esa conversación' });
     return res.json({ conversacion });
   } catch (error) {
