@@ -12,13 +12,15 @@
   --cosmic: linear-gradient(90deg, #e59cff, #ba9cff 50%, #9cb2ff);
   --glow: inset 0 0 24px rgba(255, 255, 255, 0.04);
   --glow-violeta: inset 0 -7px 11px rgba(164, 143, 255, 0.12);
-  --font-display: system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-body: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-body: system-ui, -apple-system, 'Segoe UI', sans-serif;
   --ancho-contenido: 880px;
 }
 /* 2. Base */
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
@@ -36,15 +38,21 @@ body {
 /* Fondo con profundidad: resplandores violeta fijos tras todo el contenido */
 
 body::before {
-  content: "";
+  content: '';
   position: fixed;
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  background: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(80, 70, 228, 0.3), transparent), radial-gradient(ellipse 50% 40% at 95% 45%, rgba(147, 130, 255, 0.12), transparent), radial-gradient(ellipse 50% 40% at 5% 80%, rgba(229, 156, 255, 0.09), transparent);
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(80, 70, 228, 0.3), transparent),
+    radial-gradient(ellipse 50% 40% at 95% 45%, rgba(147, 130, 255, 0.12), transparent),
+    radial-gradient(ellipse 50% 40% at 5% 80%, rgba(229, 156, 255, 0.09), transparent);
 }
 
-h1, h2, h3, h4 {
+h1,
+h2,
+h3,
+h4 {
   margin: 0;
   font-family: var(--font-display);
   font-weight: 500;
@@ -76,7 +84,9 @@ a {
   font: 500 0.95rem var(--font-body);
   cursor: pointer;
   box-shadow: var(--glow-violeta), var(--glow);
-  transition: background 0.3s, color 0.3s;
+  transition:
+    background 0.3s,
+    color 0.3s;
 }
 
 .btn:hover {
@@ -96,7 +106,9 @@ a {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     animation: none !important;
     scroll-behavior: auto !important;
   }

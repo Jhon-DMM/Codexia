@@ -1,61 +1,191 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="robots" content="index,follow">
-  <title>Política de privacidad | Codexia</title>
-  <link rel="stylesheet" href="../../css/base.css">
-  <link rel="stylesheet" href="../../css/legal.css">
-</head>
-<body class="pagina-legal">
-  <header class="legal-cabecera">
-    <a class="legal-marca" href="../../index.html"><span class="legal-marca-icono" aria-hidden="true">✦</span> Codexia</a>
-    <a class="legal-volver" href="../cuenta/index.html">Volver al acceso</a>
-  </header>
-  <nav class="legal-nav" aria-label="Documentos legales">
-    <a href="terminos.html">Términos</a><a href="privacidad.html">Privacidad</a><a href="cookies.html">Cookies</a><a href="reembolsos.html">Reembolsos</a>
-  </nav>
-  <main class="legal-documento">
-    <h1>Política de privacidad</h1>
-    <p class="legal-version">Versión 1.0 · Vigente desde el 28 de octubre de 2026</p>
-    <div class="legal-alerta"><strong>Información pendiente antes de publicar:</strong> identifica al responsable del tratamiento, su domicilio y, si aplica, NIT. Confirma el proveedor y país del alojamiento de PostgreSQL, el acuerdo con Groq, el plazo concreto de conservación de las constancias, cómo se atenderán las solicitudes de titulares y si Codexia excluirá a menores de edad o habilitará un proceso para ellos.</div>
-    <p class="legal-intro">Esta política explica cómo Codexia trata datos personales conforme a la Ley 1581 de 2012 y sus normas reglamentarias, y cómo puedes ejercer tus derechos.</p>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="index,follow" />
+    <title>Política de privacidad | Codexia</title>
+    <link rel="stylesheet" href="../../css/base.css" />
+    <link rel="stylesheet" href="../../css/legal.css" />
+  </head>
+  <body class="pagina-legal">
+    <header class="legal-cabecera">
+      <a class="legal-marca" href="../../index.html"
+        ><span class="legal-marca-icono" aria-hidden="true">✦</span> Codexia</a
+      >
+      <a class="legal-volver" href="../cuenta/index.html">Volver al acceso</a>
+    </header>
+    <nav class="legal-nav" aria-label="Documentos legales">
+      <a href="terminos.html">Términos</a><a href="privacidad.html">Privacidad</a
+      ><a href="cookies.html">Cookies</a><a href="reembolsos.html">Reembolsos</a>
+    </nav>
+    <main class="legal-documento">
+      <h1>Política de privacidad</h1>
+      <p class="legal-version">
+        Versión piloto 1.5 · Prueba no comercial · Vigente desde el 31 de octubre de 2026
+      </p>
+      <div class="legal-alerta">
+        <strong>Alcance del piloto:</strong> el backend y PostgreSQL se ejecutan localmente por el
+        responsable en Cali; los mensajes enviados al asistente se transmiten a Groq. Antes de
+        permitir acceso externo, debe habilitarse HTTPS. Salvo que se verifique Zero Data Retention
+        en la cuenta Groq, considera que Groq puede conservar registros limitados hasta 30 días.
+      </div>
+      <p class="legal-intro">
+        Esta política describe el tratamiento de datos personales durante la prueba piloto de
+        Codexia conforme a la Ley 1581 de 2012 y sus normas reglamentarias.
+      </p>
 
-    <h2>1. Responsable del tratamiento y contacto</h2>
-    <p>Responsable: <strong>[nombre completo o razón social]</strong>. NIT o identificación: <strong>[dato, si aplica]</strong>. Domicilio y dirección de notificación: <strong>[dirección en Colombia]</strong>. Correo para consultas y reclamos: <a href="mailto:jhxnmondragon@gmail.com">jhxnmondragon@gmail.com</a>. El titular de Codexia debe completar y verificar estos datos antes de publicar.</p>
+      <h2>1. Responsable del tratamiento y contacto</h2>
+      <p>
+        Responsable: <strong>Jhon Deimer Mondragon Montaño</strong>, persona natural. Domicilio y
+        dirección de notificación:
+        <strong>Calle 114 #26-120, Cali, Valle del Cauca, Colombia</strong>. Teléfono:
+        <a href="tel:+573175036274">+57 317 503 6274</a>. Correo para consultas y reclamos:
+        <a href="mailto:jhxnmondragon@gmail.com">jhxnmondragon@gmail.com</a>.
+      </p>
 
-    <h2>2. Datos que tratamos</h2>
-    <ul>
-      <li>Datos de cuenta: nombre, correo electrónico y hash de contraseña. Codexia no guarda la contraseña en texto claro.</li>
-      <li>Contenido de uso: mensajes, respuestas, títulos, fechas, identificadores de conversaciones y registros de uso y cuota.</li>
-      <li>Seguridad: hash de la combinación de correo e IP para aplicar bloqueos de inicio de sesión; no contiene el correo o la IP en texto claro en esa tabla.</li>
-      <li>Constancias legales: identificador interno de cuenta, documento y versión aceptados, hash del documento, fecha y hora del servidor, formulario utilizado, dirección IP y agente de usuario del navegador.</li>
-      <li>Datos técnicos enviados automáticamente por tu navegador al servidor para entregar la página y mantener la sesión.</li>
-    </ul>
+      <h2>2. Datos que tratamos</h2>
+      <ul>
+        <li>
+          Datos de cuenta: nombre, correo electrónico y hash de contraseña. Codexia no guarda la
+          contraseña en texto claro.
+        </li>
+        <li>
+          Contenido de uso: mensajes, respuestas, títulos, fechas, identificadores de conversaciones
+          y registros de uso y cuota. Si envías una solicitud de soporte, también tratamos su
+          categoría, asunto y contenido para responderte.
+        </li>
+        <li>
+          Seguridad: hash de la combinación de correo e IP para aplicar bloqueos de inicio de
+          sesión; no contiene el correo o la IP en texto claro en esa tabla.
+        </li>
+        <li>
+          Avisos de eliminación administrativa: hash del correo para localizar el aviso, motivo,
+          detalles, fechas y cuenta administradora que solicitó la eliminación. Para confirmar que
+          quien consulta es el titular, el aviso conserva por separado el hash de contraseña de la
+          cuenta eliminada. Ese verificador solo permite mostrar el aviso: no crea una sesión ni
+          permite recuperar la cuenta.
+        </li>
+        <li>
+          Constancias legales: identificador interno de cuenta, documento y versión aceptados, hash
+          del documento, fecha y hora del servidor, formulario utilizado, dirección IP y agente de
+          usuario del navegador.
+        </li>
+        <li>
+          Datos técnicos enviados automáticamente por tu navegador al servidor para entregar la
+          página y mantener la sesión.
+        </li>
+      </ul>
 
-    <h2>3. Finalidades</h2>
-    <p>Usamos los datos para crear y proteger cuentas, autenticar sesiones, guardar conversaciones, generar respuestas, aplicar límites de uso, prevenir abuso, mantener la seguridad, atender solicitudes y reclamaciones, y conservar evidencia de las autorizaciones y aceptaciones requeridas. No utilizamos los mensajes para publicidad personalizada.</p>
+      <h2>3. Finalidades</h2>
+      <p>
+        Usamos los datos para crear y proteger cuentas, autenticar sesiones, guardar conversaciones,
+        generar respuestas, aplicar límites de uso, prevenir abuso, mantener la seguridad, atender
+        solicitudes y reclamaciones, informar decisiones de eliminación administrativa y conservar
+        evidencia de las autorizaciones y aceptaciones requeridas. El responsable puede acceder a
+        las solicitudes de soporte que envíes; las respuestas se mostrarán en tu cuenta. No
+        utilizamos los mensajes de conversación para publicidad personalizada.
+      </p>
 
-    <h2>4. Asistente y proveedores</h2>
-    <p>Para generar una respuesta, Codexia envía a Groq el mensaje que escribes y el contexto reciente de esa conversación. Groq procesa esos datos como proveedor de la infraestructura de inferencia conforme a sus condiciones y su anexo de tratamiento de datos. Los mensajes también se guardan en la base de datos PostgreSQL configurada por el operador de Codexia. El proveedor de alojamiento, el país de almacenamiento y los acuerdos aplicables deben confirmarse para el despliegue concreto.</p>
-    <p>No envíes datos sensibles, secretos, contraseñas o información de terceros. Si incluyes esos datos voluntariamente en un mensaje, podrían quedar almacenados y ser enviados al proveedor de IA. Codexia no solicita datos sensibles para prestar el servicio.</p>
+      <h2>4. Asistente y proveedores</h2>
+      <p>
+        Para generar una respuesta, Codexia envía a Groq el mensaje actual y hasta 20 mensajes
+        previos de esa conversación. Groq procesa esos datos como proveedor de infraestructura de
+        inteligencia artificial conforme a las condiciones vigentes de la cuenta y su acuerdo de
+        tratamiento. Según la documentación vigente de Groq, los datos de inferencia no se retienen
+        por defecto; en ciertos casos de confiabilidad o prevención de abuso, entradas y salidas
+        pueden registrarse hasta 30 días. Si esos registros se conservan, Groq indica que se
+        almacenan en Google Cloud en Estados Unidos. Groq ofrece una opción Zero Data Retention,
+        pero el responsable debe comprobar si está activada en la cuenta usada para el piloto.
+        Consulta
+        <a href="https://console.groq.com/docs/your-data" target="_blank" rel="noopener noreferrer"
+          >cómo trata Groq los datos</a
+        >
+        y su
+        <a
+          href="https://console.groq.com/docs/legal/customer-data-processing-addendum"
+          target="_blank"
+          rel="noopener noreferrer"
+          >anexo de tratamiento</a
+        >. Codexia también guarda mensajes y respuestas en PostgreSQL local en Cali.
+      </p>
+      <p>
+        No envíes datos sensibles, secretos, contraseñas ni información personal o confidencial de
+        terceros. Si incluyes esos datos en un mensaje, pueden quedar guardados y enviarse a Groq
+        junto con el contexto reciente. Codexia no necesita esos datos para el piloto.
+      </p>
 
-    <h2>5. Autorización, derechos y canales</h2>
-    <p>Al marcar la casilla separada de privacidad y enviar el formulario, autorizas de manera previa, expresa e informada el tratamiento descrito en esta política. Puedes conocer, actualizar y rectificar tus datos; solicitar prueba de la autorización; preguntar por el uso dado; presentar consultas y reclamos; y solicitar revocatoria o supresión cuando proceda legalmente.</p>
-    <p>Envía tu solicitud a <a href="mailto:jhxnmondragon@gmail.com">jhxnmondragon@gmail.com</a> con el asunto “Datos personales”, identifica la cuenta y explica tu solicitud. Las consultas se atenderán en 10 días hábiles, prorrogables hasta por 5 días hábiles adicionales cuando se informe el motivo. Los reclamos se atenderán en 15 días hábiles desde el día siguiente a su recibo, prorrogables hasta por 8 días hábiles adicionales cuando se informe el motivo. Para presentar una queja ante la SIC, primero debes agotar el trámite ante el responsable.</p>
+      <h2>5. Autorización, derechos y canales</h2>
+      <p>
+        Al marcar la casilla separada de privacidad durante la creación de cuenta y enviar el
+        formulario, autorizas de manera previa, expresa e informada el tratamiento descrito en esta
+        política. Puedes conocer, actualizar y rectificar tus datos; solicitar prueba de la
+        autorización; preguntar por el uso dado; presentar consultas y reclamos; y solicitar
+        revocatoria o supresión cuando proceda legalmente.
+      </p>
+      <p>
+        Envía tu solicitud a
+        <a href="mailto:jhxnmondragon@gmail.com">jhxnmondragon@gmail.com</a> con el asunto “Datos
+        personales”, identifica la cuenta y explica tu solicitud. Las consultas se atenderán en 10
+        días hábiles, prorrogables hasta por 5 días hábiles adicionales cuando se informe el motivo.
+        Los reclamos se atenderán en 15 días hábiles desde el día siguiente a su recibo,
+        prorrogables hasta por 8 días hábiles adicionales cuando se informe el motivo. Para
+        presentar una queja ante la SIC, primero debes agotar el trámite ante el responsable.
+      </p>
 
-    <h2>6. Conservación y eliminación</h2>
-    <p>Conservamos los datos de cuenta y conversaciones mientras la cuenta permanezca activa o sean necesarios para prestar el servicio. Puedes eliminar tu cuenta y conversaciones desde la aplicación. Podremos conservar de forma restringida la constancia mínima de aceptación, los registros de seguridad y la información necesaria para atender obligaciones legales o defender reclamaciones durante el tiempo estrictamente necesario. La tabla de constancias no se elimina junto con la cuenta para preservar evidencia; el identificador de cuenta seudónimo, la IP y el agente de usuario siguen siendo datos personales y deben protegerse. El responsable debe fijar y aplicar un plazo de conservación concreto, atendiendo a la finalidad y a las obligaciones legales.</p>
+      <h2>6. Conservación y eliminación</h2>
+      <p>
+        El acceso de cada participante dura como máximo siete días desde que se habilita la cuenta
+        para el piloto; para cuentas nuevas, el plazo comienza al registrarse. Al cumplirse el
+        plazo, Codexia elimina automáticamente la cuenta, conversaciones, mensajes, datos de cuota,
+        sesiones y constancias de aceptación del piloto. Los hashes de intentos fallidos de inicio
+        de sesión se eliminan tras un día, cuando ya no hay un bloqueo activo. La limpieza se
+        ejecuta al iniciar el backend y cada minuto mientras está activo; si permanece apagado al
+        vencer una cuenta, la eliminación se ejecuta la próxima vez que se inicie. También puedes
+        eliminar manualmente tu cuenta antes de esa fecha; en ese caso se conserva la constancia
+        mínima de aceptación hasta que venza el periodo original de siete días, y luego se elimina
+        con el resto de los datos de Codexia. Cuando el equipo elimina una cuenta, conserva por
+        separado el hash del correo, el verificador de contraseña, el motivo y el detalle del aviso,
+        junto con la fecha y la constancia administrativa, para permitir que el titular consulte lo
+        ocurrido y acreditar la actuación. El verificador se conserva mientras el aviso esté
+        disponible; no guarda la contraseña en texto claro, no permite iniciar sesión y no conserva
+        las conversaciones. El plazo máximo de conservación de estos avisos debe definirse antes de
+        un lanzamiento público. El aviso aparece únicamente después de que el correo y la contraseña
+        coincidan; no hay envío de correo integrado. Los registros limitados que Groq pueda
+        conservar se rigen por sus condiciones y controles de retención.
+      </p>
 
-    <h2>7. Transferencias, transmisiones y seguridad</h2>
-    <p>El uso de Groq y del proveedor de alojamiento puede implicar tratamiento fuera de Colombia. Antes de producción, el responsable debe verificar países, roles de responsable/encargado, cláusulas o acuerdos de transmisión, medidas de seguridad y condiciones vigentes de cada proveedor. Aplicamos controles como hashes de contraseñas, sesiones con token aleatorio en cookie HttpOnly y consultas parametrizadas; ningún sistema conectado a Internet puede garantizar seguridad absoluta.</p>
+      <h2>7. Transferencias, transmisiones y seguridad</h2>
+      <p>
+        El backend y PostgreSQL del piloto se ejecutan localmente bajo control del responsable. Groq
+        puede procesar o almacenar datos en Estados Unidos conforme a sus condiciones y
+        configuración; por ello, se informa esta transmisión antes de que marques la casilla de
+        privacidad. Aplicamos controles como hashes de contraseñas, sesiones con token aleatorio en
+        cookie HttpOnly y consultas parametrizadas; ningún sistema conectado a Internet puede
+        garantizar seguridad absoluta.
+      </p>
 
-    <h2>8. Cambios</h2>
-    <p>Si cambiamos finalidades, responsable o condiciones que afecten la autorización, publicaremos la nueva versión y solicitaremos una nueva aceptación antes de continuar con el tratamiento que la requiera. Cada aceptación queda asociada a la versión y al hash del documento.</p>
+      <h2>8. Cambios</h2>
+      <p>
+        Si cambiamos finalidades, responsable o condiciones que afecten la autorización,
+        publicaremos la nueva versión y solicitaremos una nueva aceptación antes de continuar con el
+        tratamiento que la requiera. Cada aceptación queda asociada a la versión y al hash del
+        documento.
+      </p>
 
-    <h2>9. Autoridad</h2>
-    <p>La autoridad colombiana de protección de datos personales es la <a href="https://www.sic.gov.co/" rel="noopener noreferrer">Superintendencia de Industria y Comercio (SIC)</a>. Consulta la <a href="https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=49981" rel="noopener noreferrer">Ley 1581 de 2012</a>.</p>
-  </main>
-</body>
+      <h2>9. Autoridad</h2>
+      <p>
+        La autoridad colombiana de protección de datos personales es la
+        <a href="https://www.sic.gov.co/" rel="noopener noreferrer"
+          >Superintendencia de Industria y Comercio (SIC)</a
+        >. Consulta la
+        <a
+          href="https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=49981"
+          rel="noopener noreferrer"
+          >Ley 1581 de 2012</a
+        >.
+      </p>
+    </main>
+    <script type="module" src="../../js/carga-ui.js"></script>
+  </body>
 </html>

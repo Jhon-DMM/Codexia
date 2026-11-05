@@ -12,7 +12,7 @@
   /* LA MAGIA DE LA FUSIÓN:
      Inicia con tu color de medianoche, y en el último tramo (del 75% al 100%)
      se funde suavemente hacia el color de tu sección de abajo (--void) */
-  background: linear-gradient(to bottom, var(--midnight) 0%, var(--midnight) 75%, var(--void) 100% );
+  background: linear-gradient(to bottom, var(--midnight) 0%, var(--midnight) 75%, var(--void) 100%);
 }
 /* 1. El Halo de luz gigante (Usando tu color de acento --accent) */
 
@@ -24,7 +24,12 @@
   width: 1100px;
   height: 1100px;
   /* Convertimos tu color --accent a RGBA para darle transparencia sutil */
-  background: radial-gradient(circle, rgba(147, 130, 255, 0.15) 0%, rgba(16, 9, 58, 0.05) 60%, rgba(0, 0, 0, 0) 80%);
+  background: radial-gradient(
+    circle,
+    rgba(147, 130, 255, 0.15) 0%,
+    rgba(16, 9, 58, 0.05) 60%,
+    rgba(0, 0, 0, 0) 80%
+  );
   filter: blur(100px);
   border-radius: 50%;
   pointer-events: none;
@@ -44,7 +49,10 @@
   /* El interior del planeta ahora usa --midnight para mimetizarse con el espacio superior */
   background: var(--midnight);
   /* Las sombras ahora emiten luz usando tu color --accent */
-  box-shadow: 0 0 60px 15px rgba(147, 130, 255, 0.3),  /* Resplandor del borde brillante */ 0 0 150px 45px rgba(147, 130, 255, 0.12),  /* Aura cósmica expandida */ inset 0 0 30px rgba(147, 130, 255, 0.2);
+  box-shadow:
+    0 0 60px 15px rgba(147, 130, 255, 0.3),
+    /* Resplandor del borde brillante */ 0 0 150px 45px rgba(147, 130, 255, 0.12),
+    /* Aura cósmica expandida */ inset 0 0 30px rgba(147, 130, 255, 0.2);
   /* Brillo en el borde interno */
   pointer-events: none;
   animation: planetaRespirando 5s infinite alternate ease-in-out;
@@ -59,7 +67,7 @@
   }
 
   100% {
-    transform: translate(-50%, -50%) scale(1.30);
+    transform: translate(-50%, -50%) scale(1.3);
     opacity: 1;
   }
 }
@@ -81,7 +89,7 @@
   z-index: 1000;
   display: grid;
   grid-template-columns: 1fr auto;
-  grid-template-areas: "eslogan login" "menu menu";
+  grid-template-areas: 'eslogan login' 'menu menu';
   align-items: center;
   gap: 12px 16px;
   max-width: 1200px;
@@ -128,12 +136,40 @@
 .btn-login {
   grid-area: login;
   justify-self: end;
-  background:rgba(31, 1, 65, 0.8);
-  color: #fff;
+  background: var(--indigo);
+  color: var(--lilac);
+  border: 1px solid rgba(147, 130, 255, 0.32);
 }
 
 .btn-login:hover {
-  background: #330e5b;
+  background: #1a1160;
+  border-color: rgba(147, 130, 255, 0.62);
+}
+
+html {
+  scrollbar-color: rgba(166, 151, 214, 0.48) rgba(14, 11, 29, 0.72);
+  scrollbar-width: thin;
+}
+
+html::-webkit-scrollbar {
+  width: 10px;
+}
+
+html::-webkit-scrollbar-track {
+  background: rgba(14, 11, 29, 0.72);
+  border-left: 1px solid rgba(197, 180, 255, 0.08);
+}
+
+html::-webkit-scrollbar-thumb {
+  background: rgba(166, 151, 214, 0.48);
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background-clip: content-box;
+}
+
+html::-webkit-scrollbar-thumb:hover {
+  background: rgba(195, 182, 239, 0.76);
+  background-clip: content-box;
 }
 /* 5. Hero */
 
@@ -190,22 +226,30 @@
 .reveal-left {
   opacity: 0;
   transform: translateX(-60px);
-  transition: opacity 0.7s ease, transform 0.7s ease;
+  transition:
+    opacity 0.7s ease,
+    transform 0.7s ease;
 }
 
 .reveal-right {
   opacity: 0;
   transform: translateX(60px);
-  transition: opacity 0.7s ease, transform 0.7s ease;
+  transition:
+    opacity 0.7s ease,
+    transform 0.7s ease;
 }
 
 .reveal-down {
   opacity: 0;
   transform: translateY(-60px);
-  transition: opacity 0.7s ease, transform 0.7s ease;
+  transition:
+    opacity 0.7s ease,
+    transform 0.7s ease;
 }
 
-.reveal-down.show, .reveal-left.show, .reveal-right.show {
+.reveal-down.show,
+.reveal-left.show,
+.reveal-right.show {
   opacity: 1;
   transform: translateX(0);
 }
@@ -218,7 +262,7 @@
 }
 
 .seccion::before {
-  content: "";
+  content: '';
   position: absolute;
   pointer-events: none;
 }
@@ -251,7 +295,13 @@
 .seccion-nosotros::before {
   /* estrellas que titilan */
   inset: 0;
-  background-image: radial-gradient(1.5px 1.5px at 12% 25%, #fff, transparent), radial-gradient(1px 1px at 82% 15%, #fff, transparent), radial-gradient(1.5px 1.5px at 65% 70%, #fff, transparent), radial-gradient(1px 1px at 25% 80%, #fff, transparent), radial-gradient(1px 1px at 92% 55%, #fff, transparent), radial-gradient(1.5px 1.5px at 45% 10%, #fff, transparent);
+  background-image:
+    radial-gradient(1.5px 1.5px at 12% 25%, #fff, transparent),
+    radial-gradient(1px 1px at 82% 15%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 65% 70%, #fff, transparent),
+    radial-gradient(1px 1px at 25% 80%, #fff, transparent),
+    radial-gradient(1px 1px at 92% 55%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 45% 10%, #fff, transparent);
   animation: titilar 4s ease-in-out infinite alternate;
 }
 
@@ -283,7 +333,12 @@
   left: 50%;
   margin: -380px 0 0 -380px;
   border-radius: 50%;
-  background: conic-gradient(from 0deg, transparent 0 55%, rgba(186, 156, 255, 0.18) 80%, transparent);
+  background: conic-gradient(
+    from 0deg,
+    transparent 0 55%,
+    rgba(186, 156, 255, 0.18) 80%,
+    transparent
+  );
   -webkit-mask: radial-gradient(circle, #000 0, transparent 70%);
   mask: radial-gradient(circle, #000 0, transparent 70%);
   animation: girar 30s linear infinite;
@@ -340,7 +395,7 @@
 }
 
 .lista-puntos li::before {
-  content: "";
+  content: '';
   position: absolute;
   left: 0;
   top: 0.6em;
@@ -430,6 +485,26 @@ footer {
   margin-top: 32px;
 }
 
+.footer-legales {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px 22px;
+  margin-top: 28px;
+}
+
+.footer-legales a {
+  color: var(--fog);
+  font-size: 0.82rem;
+  text-underline-offset: 4px;
+  transition: color 0.2s ease;
+}
+
+.footer-legales a:hover,
+.footer-legales a:focus-visible {
+  color: var(--lilac);
+}
+
 .social-icon {
   display: inline-flex;
   color: var(--fog);
@@ -448,7 +523,9 @@ footer {
 .reveal {
   opacity: 0;
   transform: translateY(24px);
-  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+  transition:
+    opacity 0.8s ease-out,
+    transform 0.8s ease-out;
 }
 
 .reveal.show {
@@ -479,7 +556,8 @@ footer {
 }
 
 @keyframes respirar {
-  0%, 100% {
+  0%,
+  100% {
     transform: translate(-50%, -50%) scale(0.85);
     opacity: 0.6;
   }
@@ -495,7 +573,7 @@ footer {
     transform: rotate(360deg);
   }
 }
-/* Estrellas fugaces generadas por js/estrellas.js */
+/* Estrellas fugaces renderizadas por el componente React Estrellas */
 
 .estrellas {
   position: absolute;
@@ -521,7 +599,8 @@ footer {
     transform: translate(0, 0);
   }
 
-  20%, 80% {
+  20%,
+  80% {
     opacity: 1;
   }
 
@@ -542,7 +621,7 @@ footer {
 @media (min-width: 768px) {
   .encabezado {
     grid-template-columns: 1fr auto 1fr;
-    grid-template-areas: "eslogan menu login";
+    grid-template-areas: 'eslogan menu login';
   }
 
   .menu-pildora {
