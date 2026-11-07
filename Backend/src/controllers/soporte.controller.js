@@ -12,7 +12,8 @@ async function crear(req, res) {
     });
     return res.status(201).json({ solicitud });
   } catch (error) {
-    if (error.status) return res.status(error.status).json({ mensaje: error.message });
+    if (error.status && error.status < 500)
+      return res.status(error.status).json({ mensaje: error.message });
     throw error;
   }
 }

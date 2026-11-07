@@ -106,7 +106,7 @@ async function registrarUsuario(req, res) {
       password,
       evidenciaLegal: usuariosService.crearEvidenciaLegal(req, 'registro'),
     });
-    console.info(`[Codexia] Código de verificación local para ${correoNormalizado}: ${codigo}`);
+    console.info(`[Codexia] Código local de verificación: ${codigo}`);
 
     return res.status(202).json({
       mensaje: 'Cuenta pendiente de verificación',
@@ -122,11 +122,7 @@ async function registrarUsuario(req, res) {
       });
     }
 
-    console.error('Error al registrar usuario:', error.message);
-
-    return res.status(500).json({
-      mensaje: 'Ocurrió un error al registrar el usuario',
-    });
+    throw error;
   }
 }
 
@@ -144,30 +140,25 @@ async function verificarCorreoRegistro(req, res) {
       .json({ mensaje: 'Escribe un correo válido y el código de seis dígitos.' });
   }
 
-  try {
-    const resultado = await usuariosService.verificarCorreoPendiente({
-      correo: correo.trim().toLowerCase(),
-      codigo,
+  const resultado = await usuariosService.verificarCorreoPendiente({
+    correo: correo.trim().toLowerCase(),
+    codigo,
+  });
+  if (!resultado.verificado) {
+    return res.status(400).json({
+      codigo: 'CODIGO_VERIFICACION_INVALIDO',
+      mensaje: 'El código no es correcto o venció. Puedes solicitar uno nuevo.',
+      intentosRestantes: resultado.intentosRestantes,
     });
-    if (!resultado.verificado) {
-      return res.status(400).json({
-        codigo: 'CODIGO_VERIFICACION_INVALIDO',
-        mensaje: 'El código no es correcto o venció. Puedes solicitar uno nuevo.',
-        intentosRestantes: resultado.intentosRestantes,
-      });
-    }
-
-    res.cookie(COOKIE_NAME, resultado.sesion.token, opcionesCookie());
-    resultado.usuario.piloto_activo = PILOTO_ACTIVO;
-    return res.json({
-      mensaje: 'Correo verificado correctamente',
-      usuario: resultado.usuario,
-      expiraEn: resultado.sesion.expiraEn,
-    });
-  } catch (error) {
-    console.error('Error al verificar el correo:', error.message);
-    return res.status(500).json({ mensaje: 'No se pudo verificar el correo. Inténtalo de nuevo.' });
   }
+
+  res.cookie(COOKIE_NAME, resultado.sesion.token, opcionesCookie());
+  resultado.usuario.piloto_activo = PILOTO_ACTIVO;
+  return res.json({
+    mensaje: 'Correo verificado correctamente',
+    usuario: resultado.usuario,
+    expiraEn: resultado.sesion.expiraEn,
+  });
 }
 
 async function reenviarCodigoRegistro(req, res) {
@@ -182,35 +173,26 @@ async function reenviarCodigoRegistro(req, res) {
     return res.status(400).json({ mensaje: 'Escribe el correo usado al crear la cuenta.' });
   }
 
-  try {
-    const ipCliente = req.ip || req.socket?.remoteAddress || 'ip-desconocida';
-    const limite = await usuariosService.registrarIntentoRegistroPorIp(
-      crearClaveHashLimiteLogin('registro-ip', ipCliente),
-    );
-    if (limite.limitado) {
-      res.set('Retry-After', String(limite.reintentarEn));
-      return res.status(429).json({
-        mensaje: 'Se alcanzó el límite temporal de solicitudes. Inténtalo más tarde.',
-        reintentarEn: limite.reintentarEn,
-      });
-    }
-
-    const resultado = await usuariosService.reenviarCodigoVerificacionCorreo(correo);
-    if (resultado.enviado && process.env.NODE_ENV !== 'production') {
-      console.info(
-        `[Codexia] Código de verificación local para ${resultado.correo}: ${resultado.codigo}`,
-      );
-    }
-    return res.status(202).json({
-      mensaje: 'Si hay una cuenta pendiente para ese correo, enviaremos un nuevo código.',
-      reintentarEn: 60,
+  const ipCliente = req.ip || req.socket?.remoteAddress || 'ip-desconocida';
+  const limite = await usuariosService.registrarIntentoRegistroPorIp(
+    crearClaveHashLimiteLogin('registro-ip', ipCliente),
+  );
+  if (limite.limitado) {
+    res.set('Retry-After', String(limite.reintentarEn));
+    return res.status(429).json({
+      mensaje: 'Se alcanzó el límite temporal de solicitudes. Inténtalo más tarde.',
+      reintentarEn: limite.reintentarEn,
     });
-  } catch (error) {
-    console.error('Error al reenviar el código de verificación:', error.message);
-    return res
-      .status(500)
-      .json({ mensaje: 'No se pudo procesar la solicitud. Inténtalo de nuevo.' });
   }
+
+  const resultado = await usuariosService.reenviarCodigoVerificacionCorreo(correo);
+  if (resultado.enviado && process.env.NODE_ENV !== 'production') {
+    console.info(`[Codexia] Código local de verificación: ${resultado.codigo}`);
+  }
+  return res.status(202).json({
+    mensaje: 'Si hay una cuenta pendiente para ese correo, enviaremos un nuevo código.',
+    reintentarEn: 60,
+  });
 }
 
 async function iniciarSesion(req, res) {
@@ -321,16 +303,9 @@ async function actualizarMiNombre(req, res) {
     return res.status(400).json({ mensaje: 'El nombre debe tener entre 1 y 100 caracteres' });
   }
 
-  try {
-    const usuario = await usuariosService.actualizarNombre(req.usuario.id, nombre);
-    if (!usuario) return res.status(404).json({ mensaje: 'No encontramos tu cuenta' });
-    return res.json({ usuario });
-  } catch (error) {
-    console.error('Error al actualizar el nombre:', error.message);
-    return res
-      .status(500)
-      .json({ mensaje: 'No se pudo actualizar el nombre. Inténtalo de nuevo.' });
-  }
+  const usuario = await usuariosService.actualizarNombre(req.usuario.id, nombre);
+  if (!usuario) return res.status(404).json({ mensaje: 'No encontramos tu cuenta' });
+  return res.json({ usuario });
 }
 
 async function eliminarMiCuenta(req, res) {
@@ -342,17 +317,12 @@ async function eliminarMiCuenta(req, res) {
     return res.status(400).json({ mensaje: 'La contraseña supera el límite permitido' });
   }
 
-  try {
-    const eliminada = await usuariosService.eliminarCuenta(req.usuario.id, password);
-    if (!eliminada) return res.status(403).json({ mensaje: 'La contraseña no es correcta' });
+  const eliminada = await usuariosService.eliminarCuenta(req.usuario.id, password);
+  if (!eliminada) return res.status(403).json({ mensaje: 'La contraseña no es correcta' });
 
-    const { maxAge, ...opcionesBorrado } = opcionesCookie();
-    res.clearCookie(COOKIE_NAME, opcionesBorrado);
-    return res.json({ mensaje: 'La cuenta se eliminó correctamente' });
-  } catch (error) {
-    console.error('Error al eliminar la cuenta:', error.message);
-    return res.status(500).json({ mensaje: 'No se pudo eliminar la cuenta. Inténtalo de nuevo.' });
-  }
+  const { maxAge, ...opcionesBorrado } = opcionesCookie();
+  res.clearCookie(COOKIE_NAME, opcionesBorrado);
+  return res.json({ mensaje: 'La cuenta se eliminó correctamente' });
 }
 
 async function obtenerMiCuota(req, res) {

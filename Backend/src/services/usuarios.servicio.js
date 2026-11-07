@@ -502,7 +502,11 @@ async function registrarIntentoLoginFallido(claveHash) {
            ELSE INTERVAL '24 hours' END
          ELSE NULL END
      RETURNING intentos, nivel_bloqueo,
-       GREATEST(1, CEIL(EXTRACT(EPOCH FROM (bloqueada_hasta - NOW()))))::integer AS segundos`,
+       CASE
+         WHEN bloqueada_hasta > NOW()
+         THEN GREATEST(1, CEIL(EXTRACT(EPOCH FROM (bloqueada_hasta - NOW()))))::integer
+         ELSE 0
+       END AS segundos`,
     [claveHash, VENTANA_INTENTOS_MINUTOS, INTENTOS_LOGIN_MAXIMOS],
   );
   const fila = resultado.rows[0];

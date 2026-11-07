@@ -1,7 +1,48 @@
 const pool = require('../database/conexion');
 const { LIMITE_DIARIO } = require('./conversaciones.servicio');
+const usuariosService = require('./usuarios.servicio');
+const { crearClaveHashLimiteLogin } = require('../config/limites-login.config');
 const soporteService = require('./soporte.servicio');
 const eliminacionesService = require('./eliminaciones.servicio');
+
+function crearErrorVerificacion(mensaje, status, datos = {}) {
+  const error = new Error(mensaje);
+  error.status = status;
+  Object.assign(error, datos);
+  return error;
+}
+
+async function comprobarPasswordAdmin(adminId, password) {
+  const claveHash = crearClaveHashLimiteLogin('verificacion-password-admin', adminId);
+  const bloqueoActual = await usuariosService.obtenerBloqueoLogin(claveHash);
+
+  if (bloqueoActual > 0) {
+    throw crearErrorVerificacion(
+      `Se agotaron los 3 intentos. Podrás volver a verificar la contraseña en ${bloqueoActual} segundos.`,
+      429,
+      { reintentarEn: bloqueoActual, intentosRestantes: 0 },
+    );
+  }
+
+  const valida = await eliminacionesService.verificarPasswordAdmin(adminId, password);
+  if (valida) {
+    await usuariosService.limpiarIntentosLogin(claveHash);
+    return true;
+  }
+
+  const intento = await usuariosService.registrarIntentoLoginFallido(claveHash);
+  if (intento.segundos > 0) {
+    throw crearErrorVerificacion(
+      `Se agotaron los 3 intentos. Podrás volver a verificar la contraseña en ${intento.segundos} segundos.`,
+      429,
+      { reintentarEn: intento.segundos, intentosRestantes: 0 },
+    );
+  }
+
+  throw crearErrorVerificacion('La contraseña admin no es correcta.', 403, {
+    intentosRestantes: intento.restantes,
+  });
+}
 
 async function obtenerResumen() {
   const resultado = await pool.query(
@@ -213,12 +254,7 @@ async function programarEliminacionesCuenta({
     error.status = 400;
     throw error;
   }
-  const valida = await eliminacionesService.verificarPasswordAdmin(admin.id, password);
-  if (!valida) {
-    const error = new Error('La contraseña admin no es correcta.');
-    error.status = 403;
-    throw error;
-  }
+  await comprobarPasswordAdmin(admin.id, password);
   return eliminacionesService.programarEliminaciones({
     admin,
     usuarioIds,
@@ -238,7 +274,7 @@ async function cancelarEliminacionCuenta({ admin, id, req }) {
 }
 
 async function verificarPasswordAdmin(adminId, password) {
-  return eliminacionesService.verificarPasswordAdmin(adminId, password);
+  return comprobarPasswordAdmin(adminId, password);
 }
 
 module.exports = {

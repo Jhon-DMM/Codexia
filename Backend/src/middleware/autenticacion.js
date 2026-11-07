@@ -38,8 +38,7 @@ async function requerirAutenticacion(req, res, next) {
     req.tokenSesion = token;
     return next();
   } catch (error) {
-    console.error('Error al validar la sesión:', error.message);
-    return res.status(500).json({ mensaje: 'No fue posible validar la sesión' });
+    return next(error);
   }
 }
 

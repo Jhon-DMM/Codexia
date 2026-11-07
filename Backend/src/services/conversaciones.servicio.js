@@ -1,9 +1,14 @@
 const { randomUUID } = require('crypto');
 const pool = require('../database/conexion');
 const asistenteService = require('./asistente.servicio');
+const { registrarError } = require('../utils/registro-errores');
 
 const MAX_CARACTERES_MENSAJE = 4000;
 const MAX_MENSAJES_CONTEXTO = 20;
+const MENSAJES_POR_RESUMEN = 20;
+const MAX_LOTES_RESUMEN_POR_TRABAJO = 3;
+const MENSAJES_POR_PAGINA = 50;
+const trabajosResumen = new Map();
 const LIMITE_CONFIGURADO = Number(process.env.ASISTENTE_LIMITE_DIARIO);
 const LIMITE_DIARIO =
   Number.isInteger(LIMITE_CONFIGURADO) && LIMITE_CONFIGURADO > 0 ? LIMITE_CONFIGURADO : 30;
@@ -32,6 +37,109 @@ function crearTituloAlternativo(consulta) {
           .replace(/\s+\S*$/, '')
           .trim();
   return breve.charAt(0).toLocaleUpperCase('es') + breve.slice(1);
+}
+
+async function completarTituloConversacion(conversacionId, consulta, requestId) {
+  let titulo;
+
+  try {
+    titulo = await asistenteService.generarTituloConversacion(consulta);
+  } catch (error) {
+    registrarError(error, {
+      requestId,
+      contexto: 'generacion_titulo_conversacion',
+      nivel: 'warn',
+    });
+    titulo = crearTituloAlternativo(consulta);
+  }
+
+  try {
+    await pool.query(
+      `UPDATE conversaciones
+       SET titulo = CASE WHEN titulo = 'Nueva conversación' THEN $2 ELSE titulo END,
+           actualizada_en = NOW()
+       WHERE id = $1`,
+      [conversacionId, titulo],
+    );
+  } catch (error) {
+    registrarError(error, {
+      requestId,
+      contexto: 'guardar_titulo_conversacion',
+    });
+  }
+}
+
+async function actualizarResumenConversacion(usuarioId, conversacionId, requestId) {
+  for (let lote = 0; lote < MAX_LOTES_RESUMEN_POR_TRABAJO; lote += 1) {
+    const conversacion = await pool.query(
+      `SELECT resumen_contexto, resumen_hasta_chat_id
+       FROM conversaciones
+       WHERE id = $1 AND usuario_id = $2`,
+      [conversacionId, usuarioId],
+    );
+    if (!conversacion.rowCount) return;
+
+    const { resumen_contexto: resumenPrevio, resumen_hasta_chat_id: cursor } =
+      conversacion.rows[0];
+    // El OFFSET deja fuera los 20 mensajes recientes que se envían completos a Groq.
+    const corte = await pool.query(
+      `SELECT id
+       FROM chats
+       WHERE conversacion_id = $1
+       ORDER BY id DESC
+       OFFSET $2 LIMIT 1`,
+      [conversacionId, MAX_MENSAJES_CONTEXTO],
+    );
+    if (!corte.rowCount || (cursor !== null && cursor >= corte.rows[0].id)) return;
+
+    const mensajes = await pool.query(
+      `SELECT id, rol, contenido
+       FROM chats
+       WHERE conversacion_id = $1
+         AND ($2::integer IS NULL OR id > $2)
+         AND id <= $3
+       ORDER BY id ASC
+       LIMIT $4`,
+      [conversacionId, cursor, corte.rows[0].id, MENSAJES_POR_RESUMEN],
+    );
+    if (!mensajes.rowCount) return;
+
+    const resumen = await asistenteService.generarResumenConversacion(
+      resumenPrevio,
+      mensajes.rows,
+    );
+    const nuevoCursor = mensajes.rows[mensajes.rows.length - 1].id;
+    await pool.query(
+      `UPDATE conversaciones
+       SET resumen_contexto = $3, resumen_hasta_chat_id = $4
+       WHERE id = $1 AND usuario_id = $2
+         AND resumen_hasta_chat_id IS NOT DISTINCT FROM $5`,
+      [conversacionId, usuarioId, resumen, nuevoCursor, cursor],
+    );
+
+    if (mensajes.rowCount < MENSAJES_POR_RESUMEN) return;
+  }
+}
+
+function programarResumenConversacion(usuarioId, conversacionId, requestId) {
+  const clave = `${usuarioId}:${conversacionId}`;
+  const anterior = trabajosResumen.get(clave) || Promise.resolve();
+  const trabajo = anterior
+    .catch(() => {})
+    .then(() => actualizarResumenConversacion(usuarioId, conversacionId, requestId))
+    .catch((error) => {
+      registrarError(error, {
+        requestId,
+        contexto: 'generacion_resumen_conversacion',
+        nivel: 'warn',
+      });
+    });
+
+  trabajosResumen.set(clave, trabajo);
+  void trabajo.then(() => {
+    if (trabajosResumen.get(clave) === trabajo) trabajosResumen.delete(clave);
+  });
+  return trabajo;
 }
 
 async function crearConversacion(usuarioId) {
@@ -102,7 +210,7 @@ async function eliminarTodasLasConversaciones(usuarioId) {
   return resultado.rowCount;
 }
 
-async function obtenerConversacion(usuarioId, conversacionId) {
+async function obtenerConversacion(usuarioId, conversacionId, { antesDeId = null } = {}) {
   const cliente = await pool.connect();
   try {
     const resultado = await cliente.query(
@@ -112,12 +220,32 @@ async function obtenerConversacion(usuarioId, conversacionId) {
     );
     if (!resultado.rowCount) return null;
 
-    const mensajes = await cliente.query(
-      `SELECT id, rol, contenido, client_message_id, creado_en
-       FROM chats WHERE conversacion_id = $1 ORDER BY id`,
-      [conversacionId],
-    );
-    return { ...resultado.rows[0], mensajes: mensajes.rows };
+    const mensajes = antesDeId
+      ? await cliente.query(
+          `SELECT id, rol, contenido, client_message_id, creado_en
+           FROM chats
+           WHERE conversacion_id = $1 AND id < $2
+           ORDER BY id DESC
+           LIMIT $3`,
+          [conversacionId, antesDeId, MENSAJES_POR_PAGINA + 1],
+        )
+      : await cliente.query(
+          `SELECT id, rol, contenido, client_message_id, creado_en
+           FROM chats
+           WHERE conversacion_id = $1
+           ORDER BY id DESC
+           LIMIT $2`,
+          [conversacionId, MENSAJES_POR_PAGINA + 1],
+        );
+    const hayMasMensajes = mensajes.rows.length > MENSAJES_POR_PAGINA;
+    const pagina = mensajes.rows.slice(0, MENSAJES_POR_PAGINA).reverse();
+
+    return {
+      ...resultado.rows[0],
+      mensajes: pagina,
+      hayMasMensajes,
+      cursorAnterior: hayMasMensajes ? pagina[0]?.id || null : null,
+    };
   } finally {
     cliente.release();
   }
@@ -133,7 +261,15 @@ async function obtenerCuotaTransaccion(cliente, usuarioId) {
   return { usado, limite: LIMITE_DIARIO, restante: Math.max(0, LIMITE_DIARIO - usado) };
 }
 
-async function procesarMensaje({ usuarioId, conversacionId, clientMessageId, mensaje }) {
+async function procesarMensaje({
+  usuarioId,
+  conversacionId,
+  clientMessageId,
+  mensaje,
+  requestId,
+  signal,
+  onToken,
+}) {
   if (typeof mensaje !== 'string' || !mensaje.trim()) {
     const error = new Error('Escribe un mensaje antes de enviarlo');
     error.status = 400;
@@ -163,17 +299,28 @@ async function procesarMensaje({ usuarioId, conversacionId, clientMessageId, men
     throw error;
   }
 
+  // No generamos resúmenes si el usuario ya agotó su cuota diaria.
+  const usoActual = await pool.query(
+    `SELECT cantidad FROM uso_asistente
+     WHERE usuario_id = $1 AND fecha = CURRENT_DATE`,
+    [usuarioId],
+  );
+  if ((usoActual.rows[0]?.cantidad || 0) < LIMITE_DIARIO) {
+    await programarResumenConversacion(usuarioId, conversacionId, requestId);
+  }
+
   const cliente = await pool.connect();
   let cuotaReservada = false;
   let fechaCuotaReservada = null;
   let historial = [];
+  let resumenContexto = '';
   let cuota = null;
   let generarTitulo = false;
 
   try {
     await cliente.query('BEGIN');
     const conversacion = await cliente.query(
-      `SELECT id, titulo FROM conversaciones
+      `SELECT id, titulo, resumen_contexto FROM conversaciones
        WHERE id = $1 AND usuario_id = $2 FOR UPDATE`,
       [conversacionId, usuarioId],
     );
@@ -183,6 +330,7 @@ async function procesarMensaje({ usuarioId, conversacionId, clientMessageId, men
       throw error;
     }
     const tituloPendiente = conversacion.rows[0].titulo === 'Nueva conversación';
+    resumenContexto = conversacion.rows[0].resumen_contexto || '';
 
     const mensajePrevio = await cliente.query(
       `SELECT id FROM chats
@@ -252,29 +400,23 @@ async function procesarMensaje({ usuarioId, conversacionId, clientMessageId, men
   }
 
   try {
-    const respuesta = await asistenteService.obtenerRespuestaGroq(mensaje.trim(), historial);
+    const respuesta = onToken
+      ? await asistenteService.transmitirRespuestaGroq(mensaje.trim(), historial, {
+          signal,
+          onToken,
+          resumenContexto,
+        })
+      : await asistenteService.obtenerRespuestaGroq(mensaje.trim(), historial, resumenContexto);
     await pool.query(
       `INSERT INTO chats (conversacion_id, rol, contenido, client_message_id)
        VALUES ($1, 'asistente', $2, $3)`,
       [conversacionId, respuesta, clientMessageId],
     );
-    let titulo = null;
     if (generarTitulo) {
-      try {
-        titulo = await asistenteService.generarTituloConversacion(mensaje.trim());
-      } catch (errorTitulo) {
-        console.warn('No se pudo generar el título de la conversación:', errorTitulo.message);
-        titulo = crearTituloAlternativo(mensaje.trim());
-      }
+      void completarTituloConversacion(conversacionId, mensaje.trim(), requestId);
     }
-    await pool.query(
-      `UPDATE conversaciones
-       SET titulo = CASE WHEN $2::text IS NOT NULL AND titulo = 'Nueva conversación' THEN $2 ELSE titulo END,
-           actualizada_en = NOW()
-       WHERE id = $1`,
-      [conversacionId, titulo],
-    );
-    return { mensaje: respuesta, cuota };
+    void programarResumenConversacion(usuarioId, conversacionId, requestId);
+    return { mensaje: respuesta, cuota, tituloPendiente: generarTitulo };
   } catch (error) {
     if (cuotaReservada) {
       const clienteReembolso = await pool.connect();
@@ -293,7 +435,10 @@ async function procesarMensaje({ usuarioId, conversacionId, clientMessageId, men
         await clienteReembolso.query('COMMIT');
       } catch (errorReembolso) {
         await clienteReembolso.query('ROLLBACK').catch(() => {});
-        console.error('No se pudo devolver la cuota del mensaje fallido:', errorReembolso.message);
+        registrarError(errorReembolso, {
+          requestId,
+          contexto: 'reembolso_cuota_mensaje',
+        });
       } finally {
         clienteReembolso.release();
       }

@@ -8,11 +8,14 @@ const asistenteRoutes = require('./routes/asistente.routes');
 const databaseRoutes = require('./routes/database.routes');
 const usuariosRoutes = require('./routes/usuarios.routes');
 const adminRoutes = require('./routes/admin.routes');
+const identificarSolicitud = require('./middleware/identificador-solicitud');
+const { manejadorErrores } = require('./middleware/manejador-errores');
 
 const app = express();
 
 const saltosProxy = Number(process.env.TRUST_PROXY_HOPS || 0);
 app.set('trust proxy', saltosProxy);
+app.use(identificarSolicitud);
 
 const esProduccion = process.env.NODE_ENV === 'production';
 const origenesPredeterminados = esProduccion
@@ -49,6 +52,8 @@ app.use(
         return callback(null, true);
       const error = new Error(`Origen no permitido por CORS: ${origen}`);
       error.status = 403;
+      error.codigoPublico = 'ORIGEN_NO_PERMITIDO';
+      error.exponer = false;
       return callback(error);
     },
     credentials: true,
@@ -61,20 +66,19 @@ app.use('/api/asistente', asistenteRoutes);
 app.use('/api/database', databaseRoutes);
 app.use('/api/usuarios', usuariosRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api', (req, res, next) => {
+  const error = new Error('Ruta de API no encontrada');
+  error.status = 404;
+  error.codigoPublico = 'RUTA_NO_ENCONTRADA';
+  error.mensajePublico = 'La ruta solicitada no existe.';
+  next(error);
+});
 // Servir el frontend únicamente en producción
 if (process.env.NODE_ENV === 'production') {
   const frontendConstruido = path.join(__dirname, '../../Frontend/dist');
   app.use(express.static(frontendConstruido));
 }
 
-app.use((error, req, res, next) => {
-  if (res.headersSent) return next(error);
-  console.error('Error en la solicitud:', error.message);
-  const status = error.status || 500;
-  return res.status(status).json({
-    mensaje:
-      status === 413 ? 'La solicitud es demasiado grande' : 'No fue posible completar la solicitud',
-  });
-});
+app.use(manejadorErrores);
 
 module.exports = app;

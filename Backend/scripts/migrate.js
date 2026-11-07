@@ -17,6 +17,7 @@ async function ejecutarMigracion() {
     '009_limite_ip_login.sql',
     '010_limite_ip_registro.sql',
     '011_verificacion_correo.sql',
+    '012_resumen_contexto_conversaciones.sql',
   ].map((archivo) => path.join(__dirname, '..', 'database', 'migrations', archivo));
   let client;
 

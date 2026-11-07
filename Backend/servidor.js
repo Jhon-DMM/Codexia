@@ -89,6 +89,7 @@ if (process.env.NODE_ENV === 'production') {
 const app = require('./src/app');
 const usuariosService = require('./src/services/usuarios.servicio');
 const eliminacionesService = require('./src/services/eliminaciones.servicio');
+const { registrarError } = require('./src/utils/registro-errores');
 
 const puerto = Number(process.env.PORT) || 3000;
 
@@ -100,7 +101,7 @@ app.listen(puerto, () => {
       if (eliminados)
         console.log(`Limpieza del piloto: ${eliminados} cuenta(s) vencida(s) eliminada(s).`);
     } catch (error) {
-      console.error('No se pudieron limpiar los datos vencidos del piloto:', error.message);
+      registrarError(error, { contexto: 'limpieza_programada_piloto' });
     }
   };
   limpiarDatosVencidos();
@@ -111,7 +112,7 @@ app.listen(puerto, () => {
       const eliminadas = await eliminacionesService.ejecutarEliminacionesVencidas();
       if (eliminadas) console.log(`Eliminaciones programadas ejecutadas: ${eliminadas} cuenta(s).`);
     } catch (error) {
-      console.error('No se pudieron ejecutar las eliminaciones programadas:', error.message);
+      registrarError(error, { contexto: 'ejecucion_eliminaciones_programadas' });
     }
   };
   ejecutarEliminaciones();

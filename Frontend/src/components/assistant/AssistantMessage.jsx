@@ -17,7 +17,10 @@ function separarPalabras(texto) {
 
 function AssistantMessage({ message, onRetry }) {
   const esAsistente = message.role === 'asistente';
-  const segmentos = useMemo(() => separarPalabras(message.content), [message.content]);
+  const segmentos = useMemo(
+    () => (message.streaming ? [] : separarPalabras(message.content)),
+    [message.content, message.streaming],
+  );
   const [palabrasVisibles, setPalabrasVisibles] = useState(message.animar ? 0 : segmentos.length);
 
   useEffect(() => {
@@ -61,7 +64,14 @@ function AssistantMessage({ message, onRetry }) {
       ) : (
         <>
           <strong aria-hidden="true">{esAsistente ? 'Asistente: ' : 'Tú: '}</strong>
-          {esAsistente && message.animar ? (
+          {esAsistente && message.streaming ? (
+            <>
+              <span className="texto-en-escritura escribiendo" aria-hidden="true">
+                {message.content}
+              </span>
+              <span className="texto-oculto">{message.content}</span>
+            </>
+          ) : esAsistente && message.animar ? (
             <>
               <span className="texto-en-escritura" aria-hidden="true">
                 {segmentos.slice(0, palabrasVisibles).map((segmento, index) =>

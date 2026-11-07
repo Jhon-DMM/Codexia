@@ -23,6 +23,45 @@ function esperar(milisegundos) {
   return new Promise((resolve) => window.setTimeout(resolve, milisegundos));
 }
 
+async function leerEventosAsistente(respuesta, alRecibirTexto) {
+  if (!respuesta.body) throw new Error('El navegador no pudo abrir la respuesta progresiva.');
+
+  const lector = respuesta.body.getReader();
+  const decodificador = new TextDecoder();
+  let buffer = '';
+  let finalizacion = null;
+  let errorFlujo = null;
+
+  function procesarEvento(trama) {
+    const lineas = trama.split(/\r?\n/);
+    const nombreEvento = lineas.find((linea) => linea.startsWith('event:'))?.slice(6).trim();
+    const datosEvento = lineas
+      .filter((linea) => linea.startsWith('data:'))
+      .map((linea) => linea.slice(5).trim())
+      .join('\n');
+    if (!datosEvento) return;
+
+    const datos = JSON.parse(datosEvento);
+    if (nombreEvento === 'token') alRecibirTexto(datos.texto || '');
+    if (nombreEvento === 'fin') finalizacion = datos;
+    if (nombreEvento === 'error') errorFlujo = datos;
+  }
+
+  while (true) {
+    const { value, done } = await lector.read();
+    buffer += decodificador.decode(value || new Uint8Array(), { stream: !done });
+    const tramas = buffer.split(/\r?\n\r?\n/);
+    buffer = tramas.pop() || '';
+    tramas.forEach(procesarEvento);
+    if (done) break;
+  }
+
+  if (buffer.trim()) procesarEvento(buffer);
+  if (errorFlujo) throw new Error(errorFlujo.mensaje || 'No se pudo terminar la respuesta.');
+  if (!finalizacion) throw new Error('La transmisión terminó antes de completar la respuesta.');
+  return finalizacion;
+}
+
 export function useAssistant() {
   const [user, setUser] = useState(null);
   const [conversations, setConversations] = useState([]);
@@ -62,7 +101,12 @@ export function useAssistant() {
   const [closingPinned, setClosingPinned] = useState(false);
   const [animatingRows, setAnimatingRows] = useState({});
   const [chatScrollActive, setChatScrollActive] = useState(false);
+  const [cargandoMensajesAnteriores, setCargandoMensajesAnteriores] = useState(false);
+  const [hayMensajesAnteriores, setHayMensajesAnteriores] = useState(false);
   const chatRef = useRef(null);
+  const cursorMensajesAnterioresRef = useRef(null);
+  const solicitandoMensajesAnterioresRef = useRef(false);
+  const restaurarPosicionScrollRef = useRef(null);
   const inputRef = useRef(null);
   const conversationsRef = useRef([]);
   const notificationTimer = useRef(null);
@@ -135,6 +179,23 @@ export function useAssistant() {
     return datos.conversaciones;
   }, [apiFetch]);
 
+  const seguirTituloConversacion = useCallback(
+    async (id) => {
+      for (let intento = 0; intento < 6; intento += 1) {
+        await esperar(1000);
+        let lista;
+        try {
+          lista = await refrescarConversaciones();
+        } catch {
+          return;
+        }
+        const conversacion = lista.find((elemento) => elemento.id === id);
+        if (!conversacion || conversacion.titulo !== 'Nueva conversación') return;
+      }
+    },
+    [refrescarConversaciones],
+  );
+
   const cargarConversacion = useCallback(
     async (id) => {
       const { respuesta, datos } = await apiFetch(
@@ -144,6 +205,11 @@ export function useAssistant() {
       const conversacion = datos.conversacion;
       setConversationId(conversacion.id);
       window.sessionStorage.setItem(ID_CONVERSACION, conversacion.id);
+      cursorMensajesAnterioresRef.current = conversacion.cursorAnterior;
+      solicitandoMensajesAnterioresRef.current = false;
+      restaurarPosicionScrollRef.current = null;
+      setCargandoMensajesAnteriores(false);
+      setHayMensajesAnteriores(Boolean(conversacion.hayMasMensajes));
       setMessages(
         conversacion.mensajes.length
           ? conversacion.mensajes.map((message) => ({
@@ -159,6 +225,59 @@ export function useAssistant() {
     [apiFetch, refrescarConversaciones],
   );
 
+  const cargarMensajesAnteriores = useCallback(async () => {
+    const conversacionIdActual = window.sessionStorage.getItem(ID_CONVERSACION);
+    const cursor = cursorMensajesAnterioresRef.current;
+    if (
+      !conversacionIdActual ||
+      !cursor ||
+      !hayMensajesAnteriores ||
+      solicitandoMensajesAnterioresRef.current
+    ) {
+      return;
+    }
+
+    solicitandoMensajesAnterioresRef.current = true;
+    setCargandoMensajesAnteriores(true);
+
+    try {
+      const { respuesta, datos } = await apiFetch(
+        `/asistente/conversaciones/${encodeURIComponent(conversacionIdActual)}?antesDe=${cursor}`,
+      );
+      if (!respuesta.ok) {
+        throw new Error(datos.mensaje || 'No se pudieron cargar los mensajes anteriores.');
+      }
+      if (window.sessionStorage.getItem(ID_CONVERSACION) !== conversacionIdActual) return;
+
+      const conversacion = datos.conversacion;
+      const contenedor = chatRef.current;
+      if (contenedor) {
+        restaurarPosicionScrollRef.current = {
+          top: contenedor.scrollTop,
+          altura: contenedor.scrollHeight,
+        };
+      }
+
+      const anteriores = conversacion.mensajes.map((message) => ({
+        id: `db-${message.id}`,
+        role: message.rol,
+        content: message.contenido,
+      }));
+      setMessages((actuales) => {
+        const idsActuales = new Set(actuales.map((message) => message.id));
+        const nuevos = anteriores.filter((message) => !idsActuales.has(message.id));
+        return [...nuevos, ...actuales];
+      });
+      cursorMensajesAnterioresRef.current = conversacion.cursorAnterior;
+      setHayMensajesAnteriores(Boolean(conversacion.hayMasMensajes));
+    } catch (error) {
+      mostrarNotificacion(error.message || 'No se pudieron cargar los mensajes anteriores.');
+    } finally {
+      solicitandoMensajesAnterioresRef.current = false;
+      setCargandoMensajesAnteriores(false);
+    }
+  }, [apiFetch, hayMensajesAnteriores, mostrarNotificacion]);
+
   const crearConversacion = useCallback(async () => {
     const { respuesta, datos } = await apiFetch('/asistente/conversaciones', {
       method: 'POST',
@@ -166,6 +285,11 @@ export function useAssistant() {
     if (!respuesta.ok) throw new Error(datos.mensaje || 'No se pudo crear la conversación.');
     setConversationId(datos.conversationId);
     window.sessionStorage.setItem(ID_CONVERSACION, datos.conversationId);
+    cursorMensajesAnterioresRef.current = null;
+    solicitandoMensajesAnterioresRef.current = false;
+    restaurarPosicionScrollRef.current = null;
+    setHayMensajesAnteriores(false);
+    setCargandoMensajesAnteriores(false);
     setMessages([MENSAJE_INICIAL]);
     await refrescarConversaciones();
     inputRef.current?.focus();
@@ -219,7 +343,7 @@ export function useAssistant() {
 
         const usuario = cuenta.datos.usuario;
         setUser(usuario);
-        if (usuario.piloto_activo && usuario.piloto_inicio_en) {
+        if (usuario.piloto_activo && usuario.piloto_inicio_en && usuario.rol !== 'admin') {
           const fechaCreacion = new Date(usuario.piloto_inicio_en).getTime();
           const venceEn = fechaCreacion + 7 * 24 * 60 * 60 * 1000;
           window.localStorage.setItem('codexia-piloto-expira-en', String(venceEn));
@@ -240,11 +364,15 @@ export function useAssistant() {
           if (!cargada) {
             window.sessionStorage.removeItem(ID_CONVERSACION);
             setConversationId(null);
+            cursorMensajesAnterioresRef.current = null;
+            setHayMensajesAnteriores(false);
             setMessages([MENSAJE_INICIAL]);
           }
         } else {
           window.sessionStorage.removeItem(ID_CONVERSACION);
           setConversationId(null);
+          cursorMensajesAnterioresRef.current = null;
+          setHayMensajesAnteriores(false);
           setMessages([MENSAJE_INICIAL]);
         }
       } catch (error) {
@@ -267,7 +395,17 @@ export function useAssistant() {
 
   useEffect(() => {
     const container = chatRef.current;
-    if (container) container.scrollTop = container.scrollHeight;
+    if (!container) return;
+
+    const posicionPrevia = restaurarPosicionScrollRef.current;
+    if (posicionPrevia) {
+      container.scrollTop =
+        posicionPrevia.top + (container.scrollHeight - posicionPrevia.altura);
+      restaurarPosicionScrollRef.current = null;
+      return;
+    }
+
+    container.scrollTop = container.scrollHeight;
   }, [messages]);
 
   useEffect(
@@ -290,6 +428,8 @@ export function useAssistant() {
 
   const enviarPendiente = useCallback(
     async (pending) => {
+      const idRespuesta = `respuesta-${pending.clientMessageId}`;
+      let textoTransmitido = '';
       setSending(true);
       setMessages((current) => [
         ...current.filter(
@@ -306,20 +446,86 @@ export function useAssistant() {
       try {
         let result;
         for (let intento = 0; intento < 35; intento += 1) {
-          result = await apiFetch('/asistente', {
+          const respuesta = await fetch(`${apiBaseUrl()}/api/asistente`, {
             method: 'POST',
+            credentials: 'include',
+            headers: {
+              'Content-Type': 'application/json',
+              Accept: 'text/event-stream, application/json',
+            },
             body: JSON.stringify({
               conversationId: pending.conversationId,
               clientMessageId: pending.clientMessageId,
               mensaje: pending.content,
             }),
           });
-          if (result.respuesta.status !== 202) break;
-          await esperar(1000);
+
+          if (respuesta.status === 401) {
+            irAAcceso();
+            throw new Error('Tu sesión venció. Inicia sesión de nuevo.');
+          }
+          if (respuesta.status === 202) {
+            result = { respuesta, datos: await respuesta.json() };
+            if (intento < 34) await esperar(1000);
+            continue;
+          }
+
+          if (respuesta.headers.get('content-type')?.includes('text/event-stream')) {
+            const finalizacion = await leerEventosAsistente(respuesta, (fragmento) => {
+              textoTransmitido += fragmento;
+              setMessages((current) => {
+                const existente = current.some((message) => message.id === idRespuesta);
+                if (!existente) {
+                  return [
+                    ...current.filter((message) => message.id !== pending.processingId),
+                    {
+                      id: idRespuesta,
+                      role: 'asistente',
+                      content: textoTransmitido,
+                      streaming: true,
+                    },
+                  ];
+                }
+                return current.map((message) =>
+                  message.id === idRespuesta
+                    ? { ...message, content: textoTransmitido, streaming: true }
+                    : message,
+                );
+              });
+            });
+            result = {
+              respuesta,
+              datos: {
+                mensaje: textoTransmitido,
+                cuota: finalizacion.cuota,
+                tituloPendiente: finalizacion.tituloPendiente,
+              },
+              transmitida: true,
+            };
+          } else {
+            let datos = {};
+            try {
+              datos = await respuesta.json();
+            } catch {
+              // Conserva un error legible si el servidor no respondió JSON.
+            }
+            result = { respuesta, datos };
+          }
+          break;
         }
 
+        if (!result) throw new Error('No se recibió respuesta del asistente.');
+        if (!result.datos.mensaje && !result.respuesta.ok) {
+          result.datos.mensaje = `La solicitud falló (HTTP ${result.respuesta.status}).`;
+        }
+        if (result.respuesta.status === 410 && result.datos.codigo === 'PILOTO_FINALIZADO') {
+          setPilotEnded(true);
+        }
         setMessages((current) => current.filter((message) => message.id !== pending.processingId));
         actualizarCuota(result?.datos.cuota);
+        if (result.respuesta.status === 202) {
+          throw new Error('Tu mensaje sigue en proceso. Puedes volver a intentarlo en un momento.');
+        }
         if (result?.respuesta.status === 429) {
           setMessages((current) => [
             ...current,
@@ -334,23 +540,33 @@ export function useAssistant() {
         }
         if (!result?.respuesta.ok)
           throw new Error(result?.datos.mensaje || 'No fue posible enviar tu mensaje.');
-        if (result.respuesta.status === 202) {
-          throw new Error('Tu mensaje sigue en proceso. Puedes volver a intentarlo en un momento.');
-        }
 
-        setMessages((current) => [
-          ...current,
-          {
-            id: `respuesta-${pending.clientMessageId}`,
-            role: 'asistente',
-            content: result.datos.mensaje,
-            animar: true,
-          },
-        ]);
+        if (result.transmitida) {
+          setMessages((current) =>
+            current.map((message) =>
+              message.id === idRespuesta ? { ...message, streaming: false } : message,
+            ),
+          );
+        } else {
+          setMessages((current) => [
+            ...current,
+            {
+              id: idRespuesta,
+              role: 'asistente',
+              content: result.datos.mensaje,
+              animar: true,
+            },
+          ]);
+        }
         await refrescarConversaciones();
+        if (result.datos.tituloPendiente) {
+          void seguirTituloConversacion(pending.conversationId);
+        }
       } catch (error) {
         setMessages((current) => [
-          ...current.filter((message) => message.id !== pending.processingId),
+          ...current.filter(
+            (message) => message.id !== pending.processingId && message.id !== idRespuesta,
+          ),
           {
             id: pending.errorId,
             role: 'asistente',
@@ -365,7 +581,7 @@ export function useAssistant() {
         inputRef.current?.focus();
       }
     },
-    [apiFetch, actualizarCuota, refrescarConversaciones],
+    [actualizarCuota, irAAcceso, refrescarConversaciones, seguirTituloConversacion],
   );
 
   const enviarMensaje = useCallback(async () => {
@@ -575,6 +791,8 @@ export function useAssistant() {
             };
           setConversationId(null);
           window.sessionStorage.removeItem(ID_CONVERSACION);
+          cursorMensajesAnterioresRef.current = null;
+          setHayMensajesAnteriores(false);
           setMessages([MENSAJE_INICIAL]);
           await refrescarConversaciones();
           mostrarNotificacion('Se borraron todas tus conversaciones.');
@@ -709,6 +927,11 @@ export function useAssistant() {
     [mostrarBarraDesplazamiento],
   );
 
+  const handleChatScroll = useCallback(() => {
+    mostrarBarraDesplazamiento();
+    if (chatRef.current?.scrollTop <= 40) void cargarMensajesAnteriores();
+  }, [cargarMensajesAnteriores, mostrarBarraDesplazamiento]);
+
   const crearNuevaConversacion = useCallback(async () => {
     try {
       await crearConversacion();
@@ -777,6 +1000,8 @@ export function useAssistant() {
     closingPinned,
     animatingRows,
     chatScrollActive,
+    cargandoMensajesAnteriores,
+    hayMensajesAnteriores,
     chatRef,
     inputRef,
     abrirConversacion,
@@ -785,6 +1010,7 @@ export function useAssistant() {
     reintentarMensaje,
     handleSendKey,
     handleChatKey,
+    handleChatScroll,
     cambiarVista,
     toggleHistory,
     confirmarModal,

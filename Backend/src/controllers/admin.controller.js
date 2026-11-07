@@ -1,4 +1,5 @@
 const adminService = require('../services/admin.servicio');
+const { registrarError } = require('../utils/registro-errores');
 
 function paginacion(valor, predeterminado, maximo) {
   const numero = Number.parseInt(valor, 10);
@@ -96,9 +97,12 @@ async function salud(req, res) {
   try {
     return res.json({ salud: await adminService.obtenerSalud() });
   } catch (error) {
-    console.error('No se pudo consultar el estado del sistema:', error.message);
+    error.status = 503;
+    registrarError(error, { req, contexto: 'salud_sistema' });
     return res.status(503).json({
+      codigo: 'SERVICIO_NO_DISPONIBLE',
       mensaje: 'No fue posible consultar la base de datos',
+      requestId: req.id || null,
       salud: { api: 'disponible', baseDatos: 'sin conexión' },
     });
   }
@@ -161,13 +165,21 @@ async function programarEliminacion(req, res) {
     });
     return res.status(201).json(resultado);
   } catch (error) {
-    if (error.status) return res.status(error.status).json({ mensaje: error.message });
+    if (error.status && error.status < 500) {
+      if (error.reintentarEn) res.set('Retry-After', String(error.reintentarEn));
+      return res.status(error.status).json({
+        mensaje: error.message,
+        ...(Number.isInteger(error.intentosRestantes)
+          ? { intentosRestantes: error.intentosRestantes }
+          : {}),
+        ...(error.reintentarEn ? { reintentarEn: error.reintentarEn } : {}),
+      });
+    }
     if (error.code === '23505')
       return res
         .status(409)
         .json({ mensaje: 'Una o más cuentas ya tienen una eliminación pendiente.' });
-    console.error('No se pudo programar la eliminación de cuenta:', error.message);
-    return res.status(500).json({ mensaje: 'No fue posible programar la eliminación.' });
+    throw error;
   }
 }
 
@@ -188,9 +200,22 @@ async function verificarPasswordAdmin(req, res) {
   if (typeof password !== 'string' || !password || Buffer.byteLength(password, 'utf8') > 1024) {
     return res.status(400).json({ mensaje: 'Escribe la contraseña admin para continuar.' });
   }
-  const valida = await adminService.verificarPasswordAdmin(req.usuario.id, password);
-  if (!valida) return res.status(403).json({ mensaje: 'La contraseña admin no es correcta.' });
-  return res.json({ verificada: true });
+  try {
+    await adminService.verificarPasswordAdmin(req.usuario.id, password);
+    return res.json({ verificada: true });
+  } catch (error) {
+    if (error.status && error.status < 500) {
+      if (error.reintentarEn) res.set('Retry-After', String(error.reintentarEn));
+      return res.status(error.status).json({
+        mensaje: error.message,
+        ...(Number.isInteger(error.intentosRestantes)
+          ? { intentosRestantes: error.intentosRestantes }
+          : {}),
+        ...(error.reintentarEn ? { reintentarEn: error.reintentarEn } : {}),
+      });
+    }
+    throw error;
+  }
 }
 
 async function miAcceso(req, res) {

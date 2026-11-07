@@ -369,10 +369,12 @@ function Assistant() {
                 aria-label="Mensajes de la conversación"
                 aria-live="polite"
                 aria-relevant="additions text"
+                aria-busy={app.cargandoMensajesAnteriores}
                 tabIndex="0"
                 onWheel={app.mostrarBarraDesplazamiento}
                 onTouchStart={app.mostrarBarraDesplazamiento}
                 onKeyDown={app.handleChatKey}
+                onScroll={app.handleChatScroll}
               >
                 {app.messages.map((message) => (
                   <AssistantMessage
