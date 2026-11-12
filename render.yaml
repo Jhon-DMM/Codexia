@@ -3,7 +3,7 @@ services:
     runtime: node
     name: codexia-app
     plan: free
-    buildCommand: npm ci --prefix Backend && npm ci --prefix Frontend && npm --prefix Frontend run build
+    buildCommand: npm ci --prefix Backend && npm ci --prefix Frontend --include=dev && npm --prefix Frontend run build
     startCommand: npm --prefix Backend run migrate && npm --prefix Backend start
     autoDeployTrigger: commit
     envVars:
