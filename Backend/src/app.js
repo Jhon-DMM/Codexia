@@ -45,21 +45,24 @@ function esOrigenLocal(origen) {
   }
 }
 
-app.use(
-  '/api',
-  cors({
-    origin: (origen, callback) => {
-      if (!origen || origenesPermitidos.has(origen) || esOrigenLocal(origen))
-        return callback(null, true);
-      const error = new Error(`Origen no permitido por CORS: ${origen}`);
-      error.status = 403;
-      error.codigoPublico = 'ORIGEN_NO_PERMITIDO';
-      error.exponer = false;
-      return callback(error);
-    },
-    credentials: true,
-  }),
-);
+const corsApi = cors({
+  origin: (origen, callback) => {
+    if (origenesPermitidos.has(origen) || esOrigenLocal(origen)) return callback(null, true);
+    const error = new Error(`Origen no permitido por CORS: ${origen}`);
+    error.status = 403;
+    error.codigoPublico = 'ORIGEN_NO_PERMITIDO';
+    error.exponer = false;
+    return callback(error);
+  },
+  credentials: true,
+});
+
+app.use('/api', (req, res, next) => {
+  const origen = req.get('origin');
+  const origenMismo = origen && origen === `${req.protocol}://${req.get('host')}`;
+  if (!origen || origenMismo) return next();
+  return corsApi(req, res, next);
+});
 app.use(express.json({ limit: '32kb' }));
 
 app.use('/api/asistente', asistenteRoutes);
