@@ -5,14 +5,13 @@ const fs = require('fs');
 
 // 1. Lista de variables obligatorias para la aplicación
 const variablesObligatorias = [
-  'DB_HOST',
-  'DB_PORT',
-  'DB_NAME',
-  'DB_USER',
-  'DB_PASSWORD',
   'GROQ_API_KEY',
   'GROQ_MODEL',
 ];
+
+if (!process.env.DATABASE_URL) {
+  variablesObligatorias.push('DB_HOST', 'DB_PORT', 'DB_NAME', 'DB_USER', 'DB_PASSWORD');
+}
 
 if (process.env.NODE_ENV === 'production') variablesObligatorias.push('RATE_LIMIT_SECRET');
 
