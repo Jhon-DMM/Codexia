@@ -17,6 +17,8 @@ services:
         fromDatabase:
           name: codexia-db
           property: connectionString
+      - key: GROQ_BASE_URL
+        value: https://api.groq.com/openai/v1
       - key: GROQ_API_KEY
         sync: false
       - key: GROQ_MODEL
