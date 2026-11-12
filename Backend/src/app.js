@@ -46,6 +46,7 @@ function esOrigenLocal(origen) {
 }
 
 app.use(
+  '/api',
   cors({
     origin: (origen, callback) => {
       if (!origen || origenesPermitidos.has(origen) || esOrigenLocal(origen))
