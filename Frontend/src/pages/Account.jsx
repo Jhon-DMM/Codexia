@@ -410,8 +410,10 @@ function Account() {
             <p className="cuenta-verificacion-etiqueta">Un paso más</p>
             <h2 id="verificacion-titulo">Confirma tu correo</h2>
             <p id="verificacion-descripcion" className="cuenta-verificacion-descripcion">
-              Escribe el código de seis dígitos asociado a <strong>{correoVerificacion}</strong>. En
-              desarrollo, lo encontrarás en la terminal de la API.
+              Escribe el código de seis dígitos asociado a <strong>{correoVerificacion}</strong>.
+              {import.meta.env.DEV
+                ? ' En desarrollo, lo encontrarás en la terminal de la API.'
+                : ' Revisa tu correo y también la carpeta de spam.'}
             </p>
             <form className="cuenta-verificacion-form" onSubmit={enviarCodigoVerificacion}>
               <div className="cuenta-verificacion-digitos" aria-label="Código de seis dígitos">

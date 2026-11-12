@@ -1,4 +1,5 @@
 const usuariosService = require('../services/usuarios.servicio');
+const correoService = require('../services/correo.service');
 const { COOKIE_NAME, opcionesCookie, obtenerTokenSesion } = require('../config/sesion.config');
 const { MENSAJE_PILOTO_FINALIZADO } = require('../config/piloto.config');
 const { PILOTO_ACTIVO } = require('../config/piloto.config');
@@ -17,13 +18,6 @@ function describirTiempoBloqueo(segundos) {
 
 async function registrarUsuario(req, res) {
   try {
-    if (process.env.NODE_ENV === 'production') {
-      return res.status(503).json({
-        mensaje:
-          'El registro requiere configurar el envío de correo antes de habilitarse en producción.',
-      });
-    }
-
     const { nombre, correo, password } = req.body || {};
 
     if (
@@ -106,10 +100,23 @@ async function registrarUsuario(req, res) {
       password,
       evidenciaLegal: usuariosService.crearEvidenciaLegal(req, 'registro'),
     });
-    console.info(`[Codexia] Código local de verificación: ${codigo}`);
+
+    let avisoCorreo = '';
+    if (process.env.NODE_ENV === 'production') {
+      try {
+        await correoService.enviarCodigoVerificacionCorreo({ correo: usuario.correo, codigo });
+      } catch (errorCorreo) {
+        avisoCorreo =
+          'No pudimos enviar el código todavía. Puedes solicitar otro desde esta ventana en un minuto.';
+        console.error(`[Codexia] Falló el envío de verificación (${errorCorreo.codigoPublico || 'error'}).`);
+      }
+    } else {
+      console.info(`[Codexia] Código local de verificación: ${codigo}`);
+    }
 
     return res.status(202).json({
-      mensaje: 'Cuenta pendiente de verificación',
+      mensaje: avisoCorreo || 'Cuenta pendiente de verificación',
+      avisoCorreo,
       requiereVerificacion: true,
       correo: usuario.correo,
       expiracionCodigoMinutos: 10,
@@ -162,12 +169,6 @@ async function verificarCorreoRegistro(req, res) {
 }
 
 async function reenviarCodigoRegistro(req, res) {
-  if (process.env.NODE_ENV === 'production') {
-    return res.status(503).json({
-      mensaje: 'El envío de correo todavía no está configurado en producción.',
-    });
-  }
-
   const { correo } = req.body || {};
   if (typeof correo !== 'string' || !correo.trim() || correo.trim().length > 254) {
     return res.status(400).json({ mensaje: 'Escribe el correo usado al crear la cuenta.' });
@@ -186,7 +187,12 @@ async function reenviarCodigoRegistro(req, res) {
   }
 
   const resultado = await usuariosService.reenviarCodigoVerificacionCorreo(correo);
-  if (resultado.enviado && process.env.NODE_ENV !== 'production') {
+  if (resultado.enviado && process.env.NODE_ENV === 'production') {
+    await correoService.enviarCodigoVerificacionCorreo({
+      correo: resultado.correo,
+      codigo: resultado.codigo,
+    });
+  } else if (resultado.enviado) {
     console.info(`[Codexia] Código local de verificación: ${resultado.codigo}`);
   }
   return res.status(202).json({

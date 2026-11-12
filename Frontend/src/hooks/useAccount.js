@@ -266,6 +266,7 @@ export function useAccount() {
 
       if (endpoint === 'registro' && resultado.requiereVerificacion) {
         abrirVerificacion(resultado.correo || datos.correo, resultado.reintentarEn || 60);
+        setMensajeVerificacion(resultado.avisoCorreo || '');
         setMensaje('');
         return;
       }
