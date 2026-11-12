@@ -155,6 +155,58 @@
   display: none;
 }
 
+.admin-acceso-notificacion {
+  position: fixed;
+  z-index: 20;
+  top: 22px;
+  right: 22px;
+  display: flex;
+  width: min(420px, calc(100vw - 32px));
+  align-items: center;
+  gap: 11px;
+  padding: 14px 17px;
+  border: 1px solid rgba(255, 139, 155, 0.5);
+  border-radius: 12px;
+  background: rgba(50, 16, 33, 0.96);
+  box-shadow: 0 16px 42px rgba(0, 0, 0, 0.32);
+  color: #ffd7de;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  animation: admin-aviso-entrada 0.25s ease-out both;
+}
+
+.admin-acceso-notificacion span {
+  display: grid;
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(255, 139, 155, 0.16);
+  color: #ff9eac;
+  font-weight: 700;
+}
+
+@keyframes admin-aviso-entrada {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 600px) {
+  .admin-acceso-notificacion {
+    top: 12px;
+    right: 12px;
+    width: calc(100vw - 24px);
+  }
+}
+
 .admin-acceso-formulario .btn {
   display: flex;
   min-height: 47px;

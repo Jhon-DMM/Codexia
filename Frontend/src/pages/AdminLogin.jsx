@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import '../../css/base.css';
 import '../../css/admin-acceso.css';
 import { mostrarCargaNavegacion } from '../../js/carga-ui.js';
@@ -40,6 +40,8 @@ function AdminLogin() {
   const [cargando, setCargando] = useState(false);
   const [errorCredenciales, setErrorCredenciales] = useState('');
   const [mensaje, setMensaje] = useState('');
+  const [notificacion, setNotificacion] = useState('');
+  const temporizadorNotificacion = useRef(null);
 
   useEffect(() => {
     let activa = true;
@@ -67,12 +69,21 @@ function AdminLogin() {
 
     return () => {
       activa = false;
+      window.clearTimeout(temporizadorNotificacion.current);
     };
   }, []);
 
   function limpiarError() {
     setErrorCredenciales('');
     setMensaje('');
+    setNotificacion('');
+    window.clearTimeout(temporizadorNotificacion.current);
+  }
+
+  function notificarErrorCredenciales(texto) {
+    window.clearTimeout(temporizadorNotificacion.current);
+    setNotificacion(texto);
+    temporizadorNotificacion.current = window.setTimeout(() => setNotificacion(''), 4500);
   }
 
   async function manejarEnvio(evento) {
@@ -91,9 +102,9 @@ function AdminLogin() {
 
       if (!login.respuesta.ok) {
         if (login.respuesta.status === 401) {
-          setErrorCredenciales(
-            'Correo o contraseña equivocado. Revisa ambos datos e inténtalo de nuevo.',
-          );
+          const aviso = 'Correo o contraseña equivocado. Revisa ambos datos e inténtalo de nuevo.';
+          setErrorCredenciales(aviso);
+          notificarErrorCredenciales(aviso);
         } else {
           setMensaje(login.datos.mensaje || 'No se pudo iniciar sesión.');
         }
@@ -126,6 +137,13 @@ function AdminLogin() {
 
   return (
     <main className="admin-acceso-shell">
+      {notificacion && (
+        <div className="admin-acceso-notificacion" role="alert" aria-live="assertive">
+          <span aria-hidden="true">!</span>
+          {notificacion}
+        </div>
+      )}
+
       <section className="admin-acceso-lado" aria-label="Acceso al panel">
         <a className="admin-acceso-marca" href="../../index.html">
           <span aria-hidden="true">✦</span> Codexia <small>ADMIN</small>

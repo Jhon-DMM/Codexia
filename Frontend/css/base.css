@@ -35,6 +35,15 @@ body {
   font: 400 1rem/1.5 var(--font-body);
   overflow-x: hidden;
 }
+
+body.pagina-principal {
+  background: #fffefa;
+  color: #101116;
+}
+
+body.pagina-principal::before {
+  display: none;
+}
 /* Fondo con profundidad: resplandores violeta fijos tras todo el contenido */
 
 body::before {

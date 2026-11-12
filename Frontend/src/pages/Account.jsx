@@ -48,7 +48,7 @@ function Account() {
   return (
     <main className="cuenta-panel">
       <section
-        className="cuenta-acceso"
+        className={`cuenta-acceso${registroActivo ? ' registro-activo' : ''}`}
         aria-label="Acceso a Codexia"
         aria-hidden={verificacionModalAbierta}
         inert={verificacionModalAbierta}
@@ -69,9 +69,13 @@ function Account() {
             <path d="M5.7 19c.6-3.1 2.9-4.8 6.3-4.8s5.7 1.7 6.3 4.8"></path>
           </svg>
         </div>
-        <p className="cuenta-eyebrow">Tu espacio de ideas</p>
-        <h1>Qué bueno verte.</h1>
-        <p className="cuenta-intro">Inicia sesión para continuar tus conversaciones.</p>
+        <p className="cuenta-eyebrow">{registroActivo ? 'COMIENZA AQUÍ' : 'TU ESPACIO DE IDEAS'}</p>
+        <h1>{registroActivo ? 'Crea tu cuenta.' : 'Qué bueno verte.'}</h1>
+        <p className="cuenta-intro">
+          {registroActivo
+            ? 'Completa tus datos para comenzar.'
+            : 'Inicia sesión para continuar tus conversaciones.'}
+        </p>
 
         <div className="cuenta-pestanas" role="tablist" aria-label="Acceso a tu cuenta">
           <button

@@ -1,0 +1,7 @@
+services:
+  - type: web
+    runtime: static
+    name: codexia-site
+    rootDir: Frontend
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
