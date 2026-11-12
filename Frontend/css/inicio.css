@@ -573,43 +573,6 @@ footer {
     transform: rotate(360deg);
   }
 }
-/* Estrellas fugaces renderizadas por el componente React Estrellas */
-
-.estrellas {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-}
-
-.estrella {
-  position: absolute;
-  width: var(--tam);
-  height: var(--tam);
-  border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 0 6px 1px rgba(186, 156, 255, 0.8);
-  opacity: 0;
-  animation: viajar var(--dur) ease-in-out forwards;
-}
-
-@keyframes viajar {
-  0% {
-    opacity: 0;
-    transform: translate(0, 0);
-  }
-
-  20%,
-  80% {
-    opacity: 1;
-  }
-
-  100% {
-    opacity: 0;
-    transform: translate(var(--dx), var(--dy));
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .reveal {
     opacity: 1;
