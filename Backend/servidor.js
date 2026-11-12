@@ -55,7 +55,10 @@ if (
 
 // 3. Validación específica para DB_PORT (debe ser un número válido)
 const puertoDB = Number(process.env.DB_PORT);
-if (Number.isNaN(puertoDB) || !Number.isInteger(puertoDB) || puertoDB <= 0 || puertoDB > 65535) {
+if (
+  !process.env.DATABASE_URL &&
+  (Number.isNaN(puertoDB) || !Number.isInteger(puertoDB) || puertoDB <= 0 || puertoDB > 65535)
+) {
   console.error('\x1b[31m%s\x1b[0m', '============ ERROR DE VALIDACIÓN ============');
   console.error(
     '\x1b[31m%s\x1b[0m',
