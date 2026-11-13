@@ -4,6 +4,7 @@ const { COOKIE_NAME, opcionesCookie, obtenerTokenSesion } = require('../config/s
 const { MENSAJE_PILOTO_FINALIZADO } = require('../config/piloto.config');
 const { PILOTO_ACTIVO } = require('../config/piloto.config');
 const { crearClaveHashLimiteLogin } = require('../config/limites-login.config');
+const { EMAIL_VERIFICATION_REQUIRED } = require('../config/correo.config');
 
 const MAX_PASSWORD_BYTES = 1024;
 
@@ -94,12 +95,26 @@ async function registrarUsuario(req, res) {
       });
     }
 
-    const { usuario, codigo } = await usuariosService.registrarUsuarioPendiente({
+    const datosRegistro = {
       nombre,
       correo: correoNormalizado,
       password,
       evidenciaLegal: usuariosService.crearEvidenciaLegal(req, 'registro'),
-    });
+    };
+
+    if (!EMAIL_VERIFICATION_REQUIRED) {
+      const { usuario, sesion } = await usuariosService.registrarUsuario(datosRegistro);
+      usuario.piloto_activo = PILOTO_ACTIVO;
+      res.cookie(COOKIE_NAME, sesion.token, opcionesCookie());
+      return res.status(201).json({
+        mensaje: 'Cuenta creada correctamente',
+        usuario,
+        expiraEn: sesion.expiraEn,
+        requiereVerificacion: false,
+      });
+    }
+
+    const { usuario, codigo } = await usuariosService.registrarUsuarioPendiente(datosRegistro);
 
     let avisoCorreo = '';
     if (process.env.NODE_ENV === 'production') {
@@ -262,7 +277,7 @@ async function iniciarSesion(req, res) {
       mensaje: 'Esta cuenta está suspendida. Contacta con soporte.',
     });
   }
-  if (usuario?.correoNoVerificado) {
+  if (usuario?.correoNoVerificado && EMAIL_VERIFICATION_REQUIRED) {
     return res.status(403).json({
       codigo: 'CORREO_NO_VERIFICADO',
       mensaje: 'Confirma tu correo para poder iniciar sesión.',

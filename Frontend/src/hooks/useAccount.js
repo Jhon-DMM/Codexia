@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import { mostrarCargaNavegacion } from '../../js/carga-ui.js';
 
+const EMAIL_VERIFICATION_REQUIRED =
+  import.meta.env.VITE_EMAIL_VERIFICATION_REQUIRED?.trim().toLowerCase() !== 'false';
+
 function apiBaseUrl() {
   const configurada = document.querySelector('meta[name="codexia-api-base-url"]')?.content.trim();
   if (configurada) return configurada.replace(/\/+$/, '');
@@ -66,7 +69,7 @@ export function useAccount() {
   useEffect(() => {
     document.body.classList.add('pagina-cuenta');
     const correoPendiente = sessionStorage.getItem('codexia-correo-pendiente');
-    if (correoPendiente) {
+    if (EMAIL_VERIFICATION_REQUIRED && correoPendiente) {
       setCorreoVerificacion(correoPendiente);
       setRegistroPendiente(true);
       setVerificacionModalAbierta(true);
@@ -280,8 +283,15 @@ export function useAccount() {
         return;
       }
 
-      if (endpoint === 'registro/verificar-correo') {
+      if (
+        endpoint === 'login' ||
+        endpoint === 'registro' ||
+        endpoint === 'registro/verificar-correo'
+      ) {
         sessionStorage.removeItem('codexia-correo-pendiente');
+      }
+
+      if (endpoint === 'registro/verificar-correo') {
         setRegistroPendiente(false);
         setVerificacionModalAbierta(false);
       }

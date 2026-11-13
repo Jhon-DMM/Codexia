@@ -15,6 +15,7 @@ const {
   VENTANA_REGISTRO_IP_SEGUNDOS,
 } = require('../config/limites-login.config');
 const { crearClaveHashLimiteLogin } = require('../config/limites-login.config');
+const { EMAIL_VERIFICATION_REQUIRED } = require('../config/correo.config');
 
 const DURACION_SESION_DIAS = 7;
 const INTENTOS_LOGIN_MAXIMOS = 3;
@@ -338,7 +339,9 @@ async function iniciarSesion({ correo, password }) {
   if (!passwordValida) return null;
 
   if (usuario.estado === 'suspendido') return { cuentaSuspendida: true };
-  if (!usuario.correo_verificado) return { correoNoVerificado: true };
+  if (!usuario.correo_verificado && EMAIL_VERIFICATION_REQUIRED) {
+    return { correoNoVerificado: true };
+  }
 
   if (PILOTO_ACTIVO && usuario.rol !== 'admin' && pilotoFinalizado(usuario.piloto_inicio_en)) {
     await eliminarDatosPilotoUsuario(usuario.id);

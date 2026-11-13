@@ -11,6 +11,10 @@ services:
         value: production
       - key: PILOTO_ACTIVO
         value: "false"
+      - key: EMAIL_VERIFICATION_REQUIRED
+        value: "false"
+      - key: VITE_EMAIL_VERIFICATION_REQUIRED
+        value: "false"
       - key: TRUST_PROXY_HOPS
         value: "1"
       - key: DATABASE_URL
