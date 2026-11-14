@@ -93,6 +93,12 @@ html::-webkit-scrollbar-thumb:hover {
   border-color: rgba(167, 143, 255, 0.22);
   background: rgba(116, 91, 220, 0.18);
 }
+
+.admin-rol-protegido {
+  color: var(--admin-texto-secundario, #aaa4bb);
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
 .admin-sidebar-pie {
   display: grid;
   gap: 14px;

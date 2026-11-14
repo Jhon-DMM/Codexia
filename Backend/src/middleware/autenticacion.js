@@ -26,7 +26,11 @@ async function requerirAutenticacion(req, res, next) {
         mensaje: 'Esta cuenta está suspendida. Contacta con soporte.',
       });
     }
-    if (PILOTO_ACTIVO && usuario.rol !== 'admin' && pilotoFinalizado(usuario.piloto_inicio_en)) {
+    if (
+      PILOTO_ACTIVO &&
+      !['admin', 'superadmin'].includes(usuario.rol) &&
+      pilotoFinalizado(usuario.piloto_inicio_en)
+    ) {
       await usuariosService.eliminarDatosPilotoUsuario(usuario.id);
       const { maxAge, ...opcionesBorrado } = opcionesCookie();
       res.clearCookie(COOKIE_NAME, opcionesBorrado);

@@ -98,6 +98,93 @@ async function listarClientes({ busqueda = '', limite = 25, offset = 0 }) {
   return { clientes: resultado.rows, total: conteo.rows[0].total, limite, offset };
 }
 
+async function listarCuentasConRol({ busqueda = '', limite = 25, offset = 0 }) {
+  const resultado = await pool.query(
+    `SELECT id, nombre, correo, rol, estado, creado_en
+     FROM usuarios
+     WHERE rol IN ('cliente', 'admin', 'superadmin')
+       AND ($1 = '' OR nombre ILIKE '%' || $1 || '%' OR correo ILIKE '%' || $1 || '%')
+     ORDER BY CASE rol WHEN 'superadmin' THEN 0 WHEN 'admin' THEN 1 ELSE 2 END,
+       creado_en DESC, id DESC
+     LIMIT $2 OFFSET $3`,
+    [busqueda, limite, offset],
+  );
+  const conteo = await pool.query(
+    `SELECT COUNT(*)::integer AS total FROM usuarios
+     WHERE rol IN ('cliente', 'admin', 'superadmin')
+       AND ($1 = '' OR nombre ILIKE '%' || $1 || '%' OR correo ILIKE '%' || $1 || '%')`,
+    [busqueda],
+  );
+  return { cuentas: resultado.rows, total: conteo.rows[0].total, limite, offset };
+}
+
+async function cambiarRolCuenta({ superadmin, cuentaId, rol, req }) {
+  const cliente = await pool.connect();
+  try {
+    await cliente.query('BEGIN');
+    const cuenta = await cliente.query(
+      `SELECT id, nombre, correo, rol, estado
+       FROM usuarios WHERE id = $1 FOR UPDATE`,
+      [cuentaId],
+    );
+    if (!cuenta.rowCount) {
+      await cliente.query('ROLLBACK');
+      return null;
+    }
+
+    const actual = cuenta.rows[0];
+    if (actual.rol === 'superadmin') {
+      await cliente.query('ROLLBACK');
+      throw crearErrorVerificacion(
+        'La cuenta superadmin no se puede modificar desde esta pantalla.',
+        409,
+      );
+    }
+    if (actual.id === superadmin.id) {
+      await cliente.query('ROLLBACK');
+      throw crearErrorVerificacion('No puedes cambiar tu propio rol.', 409);
+    }
+    if (!['cliente', 'admin'].includes(rol)) {
+      await cliente.query('ROLLBACK');
+      throw crearErrorVerificacion('El rol solicitado no es válido.', 400);
+    }
+
+    if (actual.rol === rol) {
+      await cliente.query('COMMIT');
+      return actual;
+    }
+
+    const actualizado = await cliente.query(
+      `UPDATE usuarios SET rol = $2
+       WHERE id = $1 RETURNING id, nombre, correo, rol, estado`,
+      [cuentaId, rol],
+    );
+    if (actual.rol === 'admin' && rol === 'cliente') {
+      await cliente.query('DELETE FROM sesiones WHERE usuario_id = $1', [cuentaId]);
+    }
+    await cliente.query(
+      `INSERT INTO admin_auditoria
+        (actor_id, actor_correo, accion, objetivo_tipo, objetivo_id, detalles, ip, agente_usuario)
+       VALUES ($1, $2, 'rol_admin_actualizado', 'cuenta', $3, $4::jsonb, $5, $6)`,
+      [
+        superadmin.id,
+        superadmin.correo,
+        String(cuentaId),
+        JSON.stringify({ rolAnterior: actual.rol, rolNuevo: rol }),
+        req.ip || null,
+        (req.get('user-agent') || '').slice(0, 512) || null,
+      ],
+    );
+    await cliente.query('COMMIT');
+    return actualizado.rows[0];
+  } catch (error) {
+    await cliente.query('ROLLBACK').catch(() => {});
+    throw error;
+  } finally {
+    cliente.release();
+  }
+}
+
 async function registrarAuditoria({
   actor,
   accion,
@@ -280,6 +367,8 @@ async function verificarPasswordAdmin(adminId, password) {
 module.exports = {
   obtenerResumen,
   listarClientes,
+  listarCuentasConRol,
+  cambiarRolCuenta,
   cambiarEstadoCliente,
   listarAuditoria,
   obtenerSalud,

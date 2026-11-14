@@ -269,7 +269,8 @@ async function obtenerAvisoEliminacionPorCorreo(correo) {
 
 async function verificarPasswordAdmin(adminId, password) {
   const resultado = await pool.query(
-    `SELECT password_hash FROM usuarios WHERE id = $1 AND rol = 'admin' AND estado = 'activo'`,
+    `SELECT password_hash FROM usuarios
+     WHERE id = $1 AND rol IN ('admin', 'superadmin') AND estado = 'activo'`,
     [adminId],
   );
   if (!resultado.rowCount) return false;

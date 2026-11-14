@@ -29,6 +29,11 @@ export function useAdmin() {
   const [clients, setClients] = useState([]);
   const [clientTotal, setClientTotal] = useState(0);
   const [clientsLoading, setClientsLoading] = useState(false);
+  const [roleAccounts, setRoleAccounts] = useState([]);
+  const [roleSearch, setRoleSearch] = useState('');
+  const [roleOffset, setRoleOffset] = useState(0);
+  const [roleTotal, setRoleTotal] = useState(0);
+  const [rolesLoading, setRolesLoading] = useState(false);
   const [deleteSearch, setDeleteSearch] = useState('');
   const [deleteOffset, setDeleteOffset] = useState(0);
   const [deleteCandidates, setDeleteCandidates] = useState([]);
@@ -64,10 +69,13 @@ export function useAdmin() {
   const noticeTimer = useRef(null);
   const clientSearchTimer = useRef(null);
   const deleteSearchTimer = useRef(null);
+  const roleSearchTimer = useRef(null);
   const clientQueryRef = useRef({ offset: 0, search: '' });
   const deleteQueryRef = useRef({ offset: 0, search: '' });
+  const roleQueryRef = useRef({ offset: 0, search: '' });
   clientQueryRef.current = { offset: clientOffset, search: clientSearch };
   deleteQueryRef.current = { offset: deleteOffset, search: deleteSearch };
+  roleQueryRef.current = { offset: roleOffset, search: roleSearch };
 
   const notificar = useCallback((texto, error = false) => {
     window.clearTimeout(noticeTimer.current);
@@ -156,6 +164,56 @@ export function useAdmin() {
       }
     },
     [api],
+  );
+
+  const cargarCuentasConRol = useCallback(
+    async (offset = roleQueryRef.current.offset, busqueda = roleQueryRef.current.search) => {
+      setRolesLoading(true);
+      try {
+        const query = new URLSearchParams({
+          busqueda: busqueda.trim(),
+          limite: '25',
+          offset: String(offset),
+        });
+        const datos = await api(`/roles/cuentas?${query}`);
+        setRoleAccounts(datos.cuentas);
+        setRoleTotal(datos.total);
+        setRoleOffset(offset);
+        return datos;
+      } finally {
+        setRolesLoading(false);
+      }
+    },
+    [api],
+  );
+
+  const cambiarRolCuenta = useCallback(
+    async (cuenta) => {
+      const rol = cuenta.rol === 'admin' ? 'cliente' : 'admin';
+      const confirmacion = rol === 'admin'
+        ? `¿Asignar el rol admin a ${cuenta.nombre}?`
+        : `¿Quitar el rol admin a ${cuenta.nombre}? Sus sesiones actuales se cerrarán.`;
+      if (!window.confirm(confirmacion)) return;
+      setActionBusy((current) => ({ ...current, [`rol-${cuenta.id}`]: true }));
+      try {
+        await api(`/roles/cuentas/${encodeURIComponent(cuenta.id)}`, {
+          method: 'PATCH',
+          body: JSON.stringify({ rol }),
+        });
+        const mensaje = rol === 'admin'
+          ? `${cuenta.nombre} ahora tiene rol admin.`
+          : `Se quitó el rol admin a ${cuenta.nombre}.`;
+        mostrarMensaje(mensaje);
+        notificar(mensaje);
+        await cargarCuentasConRol();
+      } catch (error) {
+        mostrarMensaje(error.message, true);
+        notificar(error.message, true);
+      } finally {
+        setActionBusy((current) => ({ ...current, [`rol-${cuenta.id}`]: false }));
+      }
+    },
+    [api, cargarCuentasConRol, mostrarMensaje, notificar],
   );
 
   const cargarCandidatosEliminacion = useCallback(
@@ -282,6 +340,18 @@ export function useAdmin() {
     }, 250);
     return () => window.clearTimeout(deleteSearchTimer.current);
   }, [deleteSearch, view, cargarCandidatosEliminacion, mostrarMensaje, notificar]);
+
+  useEffect(() => {
+    if (view !== 'roles') return undefined;
+    window.clearTimeout(roleSearchTimer.current);
+    roleSearchTimer.current = window.setTimeout(() => {
+      cargarCuentasConRol(0, roleSearch).catch((error) => {
+        mostrarMensaje(error.message, true);
+        notificar(error.message, true);
+      });
+    }, 250);
+    return () => window.clearTimeout(roleSearchTimer.current);
+  }, [roleSearch, view, cargarCuentasConRol, mostrarMensaje, notificar]);
 
   const cargarVista = useCallback(
     async (nuevaVista) => {
@@ -575,6 +645,7 @@ export function useAdmin() {
     soporte: 'Soporte',
     auditoria: 'Seguridad y auditoría',
     facturacion: 'Planes y facturación',
+    roles: 'Administrar roles',
   };
 
   return {
@@ -592,6 +663,13 @@ export function useAdmin() {
     clientOffset,
     clientTotal,
     clientsLoading,
+    roleAccounts,
+    roleSearch,
+    setRoleSearch,
+    roleOffset,
+    setRoleOffset,
+    roleTotal,
+    rolesLoading,
     deleteSearch,
     setDeleteSearch,
     deleteOffset,
@@ -620,11 +698,13 @@ export function useAdmin() {
     cargarVista,
     actualizarTodo,
     cargarClientes,
+    cargarCuentasConRol,
     cargarCandidatosEliminacion,
     cargarEliminacionesPendientes,
     cargarAuditoria,
     cargarSoporte,
     cambiarEstadoCliente,
+    cambiarRolCuenta,
     seleccionarUsuario,
     seleccionarVisibles,
     abrirModalEliminacion,

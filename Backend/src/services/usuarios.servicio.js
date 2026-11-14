@@ -343,7 +343,11 @@ async function iniciarSesion({ correo, password }) {
     return { correoNoVerificado: true };
   }
 
-  if (PILOTO_ACTIVO && usuario.rol !== 'admin' && pilotoFinalizado(usuario.piloto_inicio_en)) {
+  if (
+    PILOTO_ACTIVO &&
+    !['admin', 'superadmin'].includes(usuario.rol) &&
+    pilotoFinalizado(usuario.piloto_inicio_en)
+  ) {
     await eliminarDatosPilotoUsuario(usuario.id);
     return { pilotoFinalizado: true };
   }
@@ -596,7 +600,8 @@ async function eliminarDatosPilotoVencidos() {
     await cliente.query('BEGIN');
     const expirados = await cliente.query(
       `SELECT id FROM usuarios
-       WHERE rol <> 'admin' AND piloto_inicio_en <= NOW() - ($1 * INTERVAL '1 day')
+       WHERE rol NOT IN ('admin', 'superadmin')
+         AND piloto_inicio_en <= NOW() - ($1 * INTERVAL '1 day')
        FOR UPDATE SKIP LOCKED`,
       [DURACION_PILOTO_DIAS],
     );

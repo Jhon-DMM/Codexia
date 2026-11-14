@@ -44,6 +44,40 @@ async function actualizarEstadoCliente(req, res) {
   return res.json({ cliente });
 }
 
+async function listarCuentasConRol(req, res) {
+  const busqueda =
+    typeof req.query.busqueda === 'string' ? req.query.busqueda.trim().slice(0, 100) : '';
+  const resultado = await adminService.listarCuentasConRol({
+    busqueda,
+    limite: paginacion(req.query.limite, 25, 100),
+    offset: paginacion(req.query.offset, 0, 100000),
+  });
+  return res.json(resultado);
+}
+
+async function cambiarRolCuenta(req, res) {
+  const id = Number.parseInt(req.params.id, 10);
+  const rol = req.body?.rol;
+  if (!Number.isInteger(id) || id < 1 || !['cliente', 'admin'].includes(rol)) {
+    return res.status(400).json({ mensaje: 'La cuenta o el rol indicado no son válidos.' });
+  }
+  try {
+    const cuenta = await adminService.cambiarRolCuenta({
+      superadmin: req.usuario,
+      cuentaId: id,
+      rol,
+      req,
+    });
+    if (!cuenta) return res.status(404).json({ mensaje: 'No encontramos esa cuenta.' });
+    return res.json({ cuenta });
+  } catch (error) {
+    if (error.status && error.status < 500) {
+      return res.status(error.status).json({ mensaje: error.message });
+    }
+    throw error;
+  }
+}
+
 async function auditoria(req, res) {
   const limite = paginacion(req.query.limite, 50, 100);
   const offset = paginacion(req.query.offset, 0, 100000);
@@ -59,6 +93,7 @@ async function auditoria(req, res) {
     'cuentas_eliminadas',
     'eliminacion_programada',
     'eliminacion_cancelada',
+    'rol_admin_actualizado',
   ];
   const categoria = typeof req.query.categoria === 'string' ? req.query.categoria : '';
   const accion = typeof req.query.accion === 'string' ? req.query.accion : '';
@@ -233,6 +268,8 @@ module.exports = {
   resumen,
   clientes,
   actualizarEstadoCliente,
+  listarCuentasConRol,
+  cambiarRolCuenta,
   auditoria,
   salud,
   solicitudesSoporte,

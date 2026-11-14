@@ -239,6 +239,112 @@ function Clientes({ state }) {
   );
 }
 
+function Roles({ state }) {
+  const limite = 25;
+  return (
+    <section className="admin-vista activa" data-panel="roles">
+      <div className="admin-panel">
+        <div className="admin-panel-titulo">
+          <div>
+            <p className="admin-eyebrow">CONTROL DE ACCESO</p>
+            <h2>Roles de las cuentas</h2>
+          </div>
+          <span className="admin-contador">{formatoNumero(state.roleTotal)} cuentas</span>
+        </div>
+        <p className="admin-ayuda">
+          Asigna o retira el rol admin. Los cambios quedan registrados y, al retirar el rol, se
+          cierran las sesiones administrativas de esa cuenta.
+        </p>
+        <label className="admin-busqueda">
+          <span aria-hidden="true">⌕</span>
+          <input
+            type="search"
+            placeholder="Buscar por nombre o correo"
+            autoComplete="off"
+            value={state.roleSearch}
+            onChange={(event) => {
+              state.setRoleSearch(event.target.value);
+              state.setRoleOffset(0);
+            }}
+          />
+        </label>
+        <div className="admin-tabla-contenedor">
+          <table className="admin-tabla">
+            <thead>
+              <tr>
+                <th>Cuenta</th>
+                <th>Rol</th>
+                <th>Estado</th>
+                <th>Registro</th>
+                <th>Acción</th>
+              </tr>
+            </thead>
+            <tbody>
+              {state.rolesLoading ? (
+                <tr>
+                  <td colSpan="5" className="admin-vacio">Cargando cuentas…</td>
+                </tr>
+              ) : state.roleAccounts.length === 0 ? (
+                <tr>
+                  <td colSpan="5" className="admin-vacio">No encontramos cuentas.</td>
+                </tr>
+              ) : state.roleAccounts.map((cuenta) => (
+                <tr key={cuenta.id}>
+                  <td>
+                    <span className="admin-cliente-nombre">{cuenta.nombre}</span>
+                    <span className="admin-cliente-correo">{cuenta.correo}</span>
+                  </td>
+                  <td>
+                    {cuenta.rol === 'superadmin'
+                      ? 'Superadmin'
+                      : cuenta.rol === 'admin'
+                        ? 'Admin'
+                        : 'Cliente'}
+                  </td>
+                  <td>{cuenta.estado === 'suspendido' ? 'Suspendida' : 'Activa'}</td>
+                  <td>
+                    <time dateTime={cuenta.creado_en}>{formatoFecha(cuenta.creado_en)}</time>
+                  </td>
+                  <td>
+                    {cuenta.rol === 'superadmin' ? (
+                      <span className="admin-rol-protegido">Rol protegido</span>
+                    ) : (
+                      <button
+                        className={`admin-accion${cuenta.rol === 'admin' ? ' admin-accion-peligro' : ''}`}
+                        type="button"
+                        disabled={state.actionBusy[`rol-${cuenta.id}`]}
+                        onClick={() => state.cambiarRolCuenta(cuenta)}
+                      >
+                        {state.actionBusy[`rol-${cuenta.id}`]
+                          ? 'Guardando…'
+                          : cuenta.rol === 'admin'
+                            ? 'Quitar admin'
+                            : 'Hacer admin'}
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <Paginacion
+          offset={state.roleOffset}
+          total={state.roleTotal}
+          limite={limite}
+          etiqueta
+          onAnterior={() => state.cargarCuentasConRol(Math.max(0, state.roleOffset - limite))}
+          onSiguiente={() =>
+            state.cargarCuentasConRol(
+              Math.min(state.roleOffset + limite, Math.max(0, state.roleTotal - 1)),
+            )
+          }
+        />
+      </div>
+    </section>
+  );
+}
+
 function Eliminaciones({ state }) {
   const visibles = state.deleteCandidates.filter((client) => !client.eliminacion_programada_en);
   const seleccionadasVisibles = visibles.filter((client) =>
@@ -506,6 +612,7 @@ function Auditoria({ state }) {
                 ['cuentas_eliminadas', 'Cuentas eliminadas'],
                 ['eliminacion_programada', 'Eliminación programada'],
                 ['eliminacion_cancelada', 'Eliminación cancelada'],
+                ['rol_admin_actualizado', 'Rol admin actualizado'],
               ].map(([value, label]) => (
                 <option key={value} value={value}>
                   {label}
@@ -902,6 +1009,7 @@ function Admin() {
     auditoria: <Auditoria state={state} />,
     soporte: <Soporte state={state} />,
     facturacion: <Facturacion state={state} />,
+    roles: <Roles state={state} />,
   };
   const navegar = (vista) => state.cargarVista(vista);
   return (
@@ -920,6 +1028,7 @@ function Admin() {
               ['soporte', '✉', 'Soporte'],
               ['auditoria', '⌁', 'Seguridad y auditoría'],
               ['facturacion', '＄', 'Planes y facturación'],
+              ...(state.admin?.rol === 'superadmin' ? [['roles', '♙', 'Administrar roles']] : []),
             ].map(([view, icon, label]) => (
               <button
                 key={view}

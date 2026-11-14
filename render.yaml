@@ -4,7 +4,7 @@ services:
     name: codexia-app
     plan: free
     buildCommand: npm ci --prefix Backend && npm ci --prefix Frontend --include=dev && npm --prefix Frontend run build
-    startCommand: npm --prefix Backend run migrate && npm --prefix Backend start
+    startCommand: npm --prefix Backend run migrate && npm --prefix Backend run superadmin:inicializar && npm --prefix Backend start
     autoDeployTrigger: commit
     envVars:
       - key: NODE_ENV

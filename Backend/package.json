@@ -8,6 +8,7 @@
     "dev": "node --watch servidor.js",
     "migrate": "node scripts/migrate.js",
     "admin:promover": "node scripts/promover-admin.js",
+    "superadmin:inicializar": "node scripts/inicializar-superadmin.js",
     "test": "node scripts/preparar-db-pruebas.js && node --test",
     "test:watch": "node --test --watch",
     "test:database": "node scripts/preparar-db-pruebas.js && node --test tests/database.integration.test.cjs"
